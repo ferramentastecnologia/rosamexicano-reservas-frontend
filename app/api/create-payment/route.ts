@@ -9,13 +9,27 @@ export async function POST(request: Request) {
     const data = await request.json();
     const { nome, email, telefone, data: dataReserva, horario, numeroPessoas } = data;
 
+    console.log('Dados recebidos:', { nome, email, telefone, dataReserva, horario, numeroPessoas });
+
     // Validação
     if (!nome || !email || !telefone || !dataReserva || !horario || !numeroPessoas) {
+      console.error('Validação falhou - dados incompletos');
       return NextResponse.json(
         { success: false, error: 'Dados incompletos' },
         { status: 400 }
       );
     }
+
+    // Verificar se as variáveis de ambiente estão configuradas
+    if (!ASAAS_API_KEY || ASAAS_API_KEY === 'COLOQUE_SUA_CHAVE_ASAAS_AQUI') {
+      console.error('ASAAS_API_KEY não configurada');
+      return NextResponse.json(
+        { success: false, error: 'Configuração do gateway de pagamento pendente' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Usando Asaas API URL:', ASAAS_API_URL);
 
     // 1. Criar cliente no Asaas
     const cleanPhone = telefone.replace(/\D/g, '');

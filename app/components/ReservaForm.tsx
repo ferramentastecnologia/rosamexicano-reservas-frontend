@@ -41,12 +41,20 @@ export default function ReservaForm() {
     setDadosReserva(data);
 
     try {
-      // Chamar API de criação de pagamento (DEMO)
-      const response = await fetch('/api/create-payment-demo', {
+      // Chamar API de criação de pagamento (PRODUÇÃO)
+      const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Erro na resposta:', errorData);
+        alert(`Erro ao processar reserva: ${errorData.error || 'Tente novamente.'}`);
+        setLoading(false);
+        return;
+      }
 
       const result = await response.json();
 
@@ -55,11 +63,11 @@ export default function ReservaForm() {
         window.location.href = result.invoiceUrl;
       } else {
         alert('Erro ao processar reserva. Tente novamente.');
+        setLoading(false);
       }
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao processar reserva. Tente novamente.');
-    } finally {
+      alert('Erro ao processar reserva. Verifique sua conexão e tente novamente.');
       setLoading(false);
     }
   };
