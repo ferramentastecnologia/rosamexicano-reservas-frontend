@@ -9,6 +9,7 @@ type ReservaFormData = {
   nome: string;
   email: string;
   telefone: string;
+  cpfCnpj: string;
   data: string;
   horario: string;
   numeroPessoas: number;
@@ -132,6 +133,25 @@ export default function ReservaForm() {
                 />
                 {errors.telefone && (
                   <p className="text-red-500 text-sm mt-1">{errors.telefone.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">CPF ou CNPJ *</label>
+                <input
+                  {...register('cpfCnpj', {
+                    required: 'CPF ou CNPJ é obrigatório',
+                    pattern: {
+                      value: /^[\d.-]+$/,
+                      message: 'CPF/CNPJ inválido',
+                    },
+                  })}
+                  type="text"
+                  className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
+                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                />
+                {errors.cpfCnpj && (
+                  <p className="text-red-500 text-sm mt-1">{errors.cpfCnpj.message}</p>
                 )}
               </div>
             </div>

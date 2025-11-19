@@ -7,15 +7,15 @@ const ASAAS_API_KEY = process.env.ASAAS_API_KEY || '';
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { nome, email, telefone, data: dataReserva, horario, numeroPessoas } = data;
+    const { nome, email, telefone, cpfCnpj, data: dataReserva, horario, numeroPessoas } = data;
 
-    console.log('Dados recebidos:', { nome, email, telefone, dataReserva, horario, numeroPessoas });
+    console.log('Dados recebidos:', { nome, email, telefone, cpfCnpj, dataReserva, horario, numeroPessoas });
 
     // Validação
-    if (!nome || !email || !telefone || !dataReserva || !horario || !numeroPessoas) {
+    if (!nome || !email || !telefone || !cpfCnpj || !dataReserva || !horario || !numeroPessoas) {
       console.error('Validação falhou - dados incompletos');
       return NextResponse.json(
-        { success: false, error: 'Dados incompletos' },
+        { success: false, error: 'Dados incompletos. Preencha todos os campos.' },
         { status: 400 }
       );
     }
@@ -33,10 +33,11 @@ export async function POST(request: Request) {
 
     // 1. Criar cliente no Asaas
     const cleanPhone = telefone.replace(/\D/g, '');
+    const cleanCpfCnpj = cpfCnpj.replace(/\D/g, '');
 
     console.log('Criando cliente no Asaas...');
     console.log('URL:', `${ASAAS_API_URL}/customers`);
-    console.log('Dados:', { name: nome, email, mobilePhone: cleanPhone });
+    console.log('Dados:', { name: nome, email, mobilePhone: cleanPhone, cpfCnpj: cleanCpfCnpj });
 
     const customerResponse = await fetch(`${ASAAS_API_URL}/customers`, {
       method: 'POST',
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
         name: nome,
         email: email,
         mobilePhone: cleanPhone,
+        cpfCnpj: cleanCpfCnpj,
       }),
     });
 
@@ -120,6 +122,8 @@ export async function POST(request: Request) {
         status: 'pending',
       },
     });
+
+    console.log('Reserva criada com sucesso:', reservation.id);
 
     console.log('Reserva criada:', reservation.id);
 
