@@ -12,9 +12,14 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl md:text-4xl font-serif text-white font-bold">
-                Rosa Mexicano
-              </h1>
+              <Image
+                src="/images/logo-rosa-mexicano.png"
+                alt="Rosa Mexicano"
+                width={180}
+                height={60}
+                priority
+                className="h-14 w-auto drop-shadow-lg"
+              />
               <div className="hidden md:block border-l border-white/30 pl-4">
                 <p className="text-xs text-white/90 font-light tracking-wide">Restaurante Mexicano</p>
               </div>
@@ -295,9 +300,13 @@ export default function Home() {
       <footer className="py-12 bg-black border-t border-zinc-800">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center text-zinc-400">
-            <h2 className="text-2xl font-serif text-white font-bold mb-6">
-              Rosa Mexicano
-            </h2>
+            <Image
+              src="/images/logo-rosa-mexicano.png"
+              alt="Rosa Mexicano"
+              width={160}
+              height={53}
+              className="h-12 w-auto mb-6 opacity-90"
+            />
             <p className="mb-2 text-white">© 2025 Rosa Mexicano Restaurante</p>
             <p className="text-sm">Sabor Autêntico Mexicano</p>
             <p className="text-xs mt-4">Rua 7 de Setembro, 1234 - Centro, Blumenau/SC</p>
