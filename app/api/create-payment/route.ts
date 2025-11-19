@@ -131,21 +131,40 @@ export async function POST(request: Request) {
 
     console.log('Reserva criada com sucesso:', reservation.id);
 
-    console.log('Reserva criada:', reservation.id);
+    // 5. Buscar dados do PIX (QR Code)
+    console.log('Buscando QR Code PIX...');
+    const pixResponse = await fetch(`${ASAAS_API_URL}/payments/${payment.id}/pixQrCode`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'access_token': ASAAS_API_KEY,
+      },
+    });
 
-    // 5. Retornar dados do PIX para checkout transparente
+    const pixData = await pixResponse.json();
+    console.log('Dados do PIX recebidos:', pixResponse.ok ? 'Sucesso' : 'Falhou');
+    console.log('PIX payload:', pixData.payload ? 'Presente' : 'Ausente');
+    console.log('PIX encodedImage:', pixData.encodedImage ? 'Presente' : 'Ausente');
+
+    if (!pixResponse.ok || !pixData.payload) {
+      console.error('Erro ao buscar QR Code PIX:', pixData);
+      return NextResponse.json(
+        { success: false, error: 'Erro ao gerar QR Code PIX. Tente novamente.' },
+        { status: 500 }
+      );
+    }
+
+    // 6. Retornar dados do PIX para checkout transparente
     console.log('Pagamento PIX criado com sucesso');
-    console.log('PIX QR Code:', payment.encodedImage ? 'Presente' : 'Ausente');
-    console.log('PIX Copy/Paste:', payment.payload ? 'Presente' : 'Ausente');
 
     return NextResponse.json({
       success: true,
       reservationId: reservation.id,
       paymentId: payment.id,
-      pixQrCode: payment.payload || payment.pixQrCodeCopyPaste, // Código PIX para gerar QR Code
-      pixCopyPaste: payment.payload || payment.pixQrCodeCopyPaste, // Código PIX Copia e Cola
-      pixEncodedImage: payment.encodedImage, // QR Code base64 do Asaas (opcional)
-      expirationDate: payment.expirationDate || dueDate.toISOString(),
+      pixQrCode: pixData.payload, // Código PIX para gerar QR Code
+      pixCopyPaste: pixData.payload, // Código PIX Copia e Cola
+      pixEncodedImage: pixData.encodedImage, // QR Code base64 do Asaas (opcional)
+      expirationDate: pixData.expirationDate || dueDate.toISOString(),
       reservationData: {
         nome,
         email,
