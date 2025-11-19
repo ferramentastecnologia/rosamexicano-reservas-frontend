@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Calendar, Users, Clock, User, Mail, Phone, CreditCard } from 'lucide-react';
 import CalendarioReserva from './CalendarioReserva';
+import MapaMesas from './MapaMesas';
 
 type ReservaFormData = {
   nome: string;
@@ -16,7 +17,7 @@ type ReservaFormData = {
 };
 
 const horarios = [
-  '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'
+  '18:00', '18:30', '19:00', '19:30'
 ];
 
 export default function ReservaForm() {
@@ -24,20 +25,38 @@ export default function ReservaForm() {
   const [etapa, setEtapa] = useState<'formulario' | 'pagamento'>('formulario');
   const [dadosReserva, setDadosReserva] = useState<ReservaFormData | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedTables, setSelectedTables] = useState<number[]>([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm<ReservaFormData>();
+
+  // Watch para atualizar o mapa de mesas em tempo real
+  const watchedData = useWatch({ control, name: 'data' });
+  const watchedHorario = useWatch({ control, name: 'horario' });
+  const watchedNumeroPessoas = useWatch({ control, name: 'numeroPessoas' });
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
     setValue('data', date);
   };
 
+  const handleMesasSelect = (mesas: number[]) => {
+    setSelectedTables(mesas);
+  };
+
   const onSubmit = async (data: ReservaFormData) => {
+    // Validar seleção de mesas
+    const mesasNecessarias = Math.ceil(data.numeroPessoas / 4);
+    if (selectedTables.length !== mesasNecessarias) {
+      alert(`Por favor, selecione exatamente ${mesasNecessarias} mesa(s) para ${data.numeroPessoas} pessoas.`);
+      return;
+    }
+
     setLoading(true);
     setDadosReserva(data);
 
@@ -69,7 +88,10 @@ export default function ReservaForm() {
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          mesasSelecionadas: JSON.stringify(selectedTables),
+        }),
       });
 
       if (!response.ok) {
@@ -276,30 +298,48 @@ export default function ReservaForm() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Número de Pessoas *</label>
-              <select
+              <input
                 {...register('numeroPessoas', {
                   required: 'Número de pessoas é obrigatório',
                   valueAsNumber: true,
+                  min: {
+                    value: 2,
+                    message: 'Mínimo 2 pessoas'
+                  },
+                  max: {
+                    value: 60,
+                    message: 'Máximo 60 pessoas por reserva'
+                  },
+                  validate: (value) => {
+                    if (value % 2 !== 0) {
+                      return 'Apenas múltiplos de 2 são permitidos';
+                    }
+                    return true;
+                  }
                 })}
+                type="number"
+                min="2"
+                max="60"
+                step="2"
+                placeholder="Digite o número de pessoas (múltiplos de 2)"
                 className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-              >
-                <option value="">Selecione o número de pessoas</option>
-                <option value="2">2 pessoas</option>
-                <option value="4">4 pessoas</option>
-                <option value="6">6 pessoas</option>
-                <option value="8">8 pessoas</option>
-                <option value="10">10 pessoas</option>
-                <option value="12">12 pessoas</option>
-              </select>
+              />
               {errors.numeroPessoas && (
                 <p className="text-red-500 text-sm mt-1">{errors.numeroPessoas.message}</p>
               )}
               <p className="text-xs text-zinc-500 mt-1">
-                Máximo 12 pessoas por reserva • Apenas múltiplos de 2
+                Múltiplos de 2 • Mínimo: 2 pessoas • Máximo: 60 pessoas
               </p>
-              <p className="text-xs text-zinc-500 mt-1">
-                Para grupos maiores, faça reservas separadas
-              </p>
+            </div>
+
+            {/* Mapa de Mesas */}
+            <div className="md:col-span-2">
+              <MapaMesas
+                data={watchedData || ''}
+                horario={watchedHorario || ''}
+                numeroPessoas={watchedNumeroPessoas || 0}
+                onMesasSelect={handleMesasSelect}
+              />
             </div>
           </div>
         </div>

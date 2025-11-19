@@ -7,9 +7,9 @@ const ASAAS_API_KEY = process.env.ASAAS_API_KEY || '';
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { nome, email, telefone, cpfCnpj, data: dataReserva, horario, numeroPessoas } = data;
+    const { nome, email, telefone, cpfCnpj, data: dataReserva, horario, numeroPessoas, mesasSelecionadas } = data;
 
-    console.log('Dados recebidos:', { nome, email, telefone, cpfCnpj, dataReserva, horario, numeroPessoas });
+    console.log('Dados recebidos:', { nome, email, telefone, cpfCnpj, dataReserva, horario, numeroPessoas, mesasSelecionadas });
 
     // Validação
     if (!nome || !email || !telefone || !cpfCnpj || !dataReserva || !horario || !numeroPessoas) {
@@ -121,9 +121,11 @@ export async function POST(request: Request) {
         nome: nome,
         email: email,
         telefone: telefone,
+        cpfCnpj: cpfCnpj,
         data: dataReserva,
         horario: horario,
         numeroPessoas: numeroPessoas,
+        mesasSelecionadas: mesasSelecionadas || null,
         valor: 50.00,
         status: 'pending',
       },

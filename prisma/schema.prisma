@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
@@ -12,63 +9,43 @@ datasource db {
 }
 
 model Reservation {
-  id            String   @id @default(cuid())
-  paymentId     String   @unique // ID do pagamento no Asaas
-  externalRef   String   @unique // RESERVA-{timestamp}
-
-  // Dados pessoais
-  nome          String
-  email         String
-  telefone      String
-
-  // Detalhes da reserva
-  data          String   // YYYY-MM-DD
-  horario       String   // HH:MM
-  numeroPessoas Int
-
-  // Pagamento
-  valor         Float    // 50.00
-  status        String   @default("pending") // pending, confirmed, cancelled
-
-  // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relacionamento
-  voucher       Voucher?
+  id                String   @id @default(cuid())
+  paymentId         String   @unique
+  externalRef       String   @unique
+  nome              String
+  email             String
+  telefone          String
+  data              String
+  horario           String
+  numeroPessoas     Int
+  valor             Float
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  cpfCnpj           String?
+  mesasSelecionadas String?
+  voucher           Voucher?
 
   @@index([email])
   @@index([data])
+  @@index([horario])
   @@index([status])
+  @@index([data, horario])
 }
 
 model Voucher {
-  id              String      @id @default(cuid())
-  reservationId   String      @unique
-  reservation     Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
-
-  // Código do voucher
-  codigo          String      @unique // MOR-XXXXXXXX-XXXXXXXX
-
-  // Valor
-  valor           Float       // 50.00
-
-  // QR Code
-  qrCodeData      String      // Dados do QR Code
-
-  // Status
-  utilizado       Boolean     @default(false)
-  dataUtilizacao  DateTime?
-
-  // Validade
-  dataValidade    DateTime    // 31/12/2025
-
-  // PDF
-  pdfUrl          String?     // URL do PDF gerado
-
-  // Timestamps
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id             String      @id @default(cuid())
+  reservationId  String      @unique
+  codigo         String      @unique
+  valor          Float
+  qrCodeData     String
+  utilizado      Boolean     @default(false)
+  dataUtilizacao DateTime?
+  dataValidade   DateTime
+  pdfUrl         String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  reservation    Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
   @@index([codigo])
   @@index([utilizado])

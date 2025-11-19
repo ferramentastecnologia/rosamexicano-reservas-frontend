@@ -67,7 +67,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-[#E53935]" />
-                <span className="font-light">Grupos de 2 a 12 pessoas</span>
+                <span className="font-light">Grupos de 2 a 60 pessoas</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#E53935]" />
@@ -126,7 +126,7 @@ export default function Home() {
                 <div className="grid md:grid-cols-2 gap-4 text-sm text-left">
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-zinc-300">Reservas de <strong>2 a 12 pessoas</strong></span>
+                    <span className="text-zinc-300">Reservas de <strong>2 a 60 pessoas</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -139,6 +139,14 @@ export default function Home() {
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                     <span className="text-zinc-300">Capacidade: <strong>60 pessoas/horário</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-zinc-300">Horários: <strong>18:00 às 19:30</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-zinc-300"><strong>Escolha suas mesas</strong> no mapa</span>
                   </div>
                   <div className="flex items-start gap-2 md:col-span-2">
                     <Check className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
