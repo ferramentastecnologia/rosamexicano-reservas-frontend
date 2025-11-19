@@ -87,124 +87,129 @@ function PagamentoContent() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
+      {/* Header Compacto */}
       <header className="bg-gradient-to-r from-[#B71C1C] to-[#8B0000] shadow-lg">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-center">
-            <h1 className="text-3xl md:text-4xl font-serif text-white font-bold">
-              Rosa Mexicano
-            </h1>
+            <Image
+              src="/images/logo-rosa-mexicano.png"
+              alt="Rosa Mexicano"
+              width={120}
+              height={40}
+              className="h-10 w-auto"
+            />
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          {/* Status */}
-          <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-500" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold">Aguardando Pagamento</h2>
-                <p className="text-sm text-zinc-400">Escaneie o QR Code ou copie o código PIX</p>
-              </div>
-            </div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-4">
 
-            {/* Timer */}
-            <div className="bg-black rounded-lg p-4 text-center">
-              <p className="text-sm text-zinc-400 mb-1">Tempo restante para pagamento</p>
-              <p className="text-3xl font-bold text-[#E53935]">{formatTime(timeLeft)}</p>
-            </div>
-          </div>
-
-          {/* QR Code */}
-          <div className="bg-zinc-900 rounded-lg p-8 border border-zinc-800 mb-6">
-            <h3 className="text-xl font-semibold mb-6 text-center">Pague com PIX</h3>
-
-            {/* QR Code Image */}
-            {qrCodeImage && (
-              <div className="bg-white rounded-lg p-6 mb-6 flex justify-center">
-                <Image
-                  src={qrCodeImage}
-                  alt="QR Code PIX"
-                  width={300}
-                  height={300}
-                  className="rounded-lg"
-                />
-              </div>
-            )}
-
-            {/* Valor */}
-            <div className="text-center mb-6">
-              <p className="text-sm text-zinc-400 mb-1">Valor a pagar</p>
-              <p className="text-4xl font-bold text-[#E53935]">R$ 50,00</p>
-            </div>
-
-            {/* Código PIX */}
-            {paymentData.pixCopyPaste && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Código PIX Copia e Cola</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={paymentData.pixCopyPaste}
-                    readOnly
-                    className="flex-1 px-4 py-3 bg-black border border-zinc-700 rounded-lg text-white text-sm font-mono"
-                  />
-                  <button
-                    onClick={copyPixCode}
-                    className="px-6 py-3 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition flex items-center gap-2"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-5 h-5" />
-                        Copiado!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-5 h-5" />
-                        Copiar
-                      </>
-                    )}
-                  </button>
+            {/* Coluna 1: QR Code e Pagamento */}
+            <div className="space-y-4">
+              {/* QR Code e Pagamento Unificado */}
+              <div className="bg-zinc-900 rounded-lg p-5 border border-zinc-800">
+                {/* Timer no topo */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm font-medium">Aguardando Pagamento</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-zinc-400">Expira em</p>
+                    <p className="text-lg font-bold text-[#E53935]">{formatTime(timeLeft)}</p>
+                  </div>
                 </div>
+
+                <h3 className="text-lg font-semibold mb-4 text-center">Pague com PIX</h3>
+
+                {/* QR Code Image */}
+                {qrCodeImage && (
+                  <div className="bg-white rounded-lg p-3 mb-4 flex justify-center">
+                    <Image
+                      src={qrCodeImage}
+                      alt="QR Code PIX"
+                      width={220}
+                      height={220}
+                      className="rounded-lg"
+                    />
+                  </div>
+                )}
+
+                {/* Valor */}
+                <div className="text-center mb-4">
+                  <p className="text-xs text-zinc-400 mb-1">Valor a pagar</p>
+                  <p className="text-2xl font-bold text-[#E53935]">R$ 50,00</p>
+                </div>
+
+                {/* Código PIX */}
+                {paymentData.pixCopyPaste && (
+                  <div>
+                    <label className="block text-xs font-medium mb-2">Código PIX Copia e Cola</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={paymentData.pixCopyPaste}
+                        readOnly
+                        className="flex-1 px-3 py-2 bg-black border border-zinc-700 rounded-lg text-white text-xs font-mono"
+                      />
+                      <button
+                        onClick={copyPixCode}
+                        className="px-3 py-2 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition flex items-center gap-2 text-sm"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Copiado!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            Copiar
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+
+            {/* Coluna 2: Instruções e Detalhes */}
+            <div className="space-y-4">
 
           {/* Instruções */}
-          <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-            <h3 className="text-lg font-semibold mb-4">Como pagar com PIX</h3>
-            <ol className="space-y-3 text-zinc-300">
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-[#E53935] rounded-full flex items-center justify-center text-sm font-bold">1</span>
+          <div className="bg-zinc-900 rounded-lg p-5 border border-zinc-800">
+            <h3 className="text-base font-semibold mb-3">Como pagar com PIX</h3>
+            <ol className="space-y-2.5 text-sm text-zinc-300">
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#E53935] rounded-full flex items-center justify-center text-xs font-bold">1</span>
                 <span>Abra o app do seu banco</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-[#E53935] rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                <span>Escolha pagar com PIX QR Code ou PIX Copia e Cola</span>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#E53935] rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <span>Escolha PIX QR Code ou PIX Copia e Cola</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-[#E53935] rounded-full flex items-center justify-center text-sm font-bold">3</span>
-                <span>Escaneie o QR Code acima ou cole o código PIX</span>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#E53935] rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <span>Escaneie o QR Code ou cole o código PIX</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-[#E53935] rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#E53935] rounded-full flex items-center justify-center text-xs font-bold">4</span>
                 <span>Confirme o pagamento de R$ 50,00</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-[#E53935] rounded-full flex items-center justify-center text-sm font-bold">5</span>
-                <span>Aguarde a confirmação automática (geralmente instantânea)</span>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#E53935] rounded-full flex items-center justify-center text-xs font-bold">5</span>
+                <span>Aguarde a confirmação (geralmente instantânea)</span>
               </li>
             </ol>
           </div>
 
           {/* Detalhes da Reserva */}
           {paymentData.reservationData && (
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mt-6">
-              <h3 className="text-lg font-semibold mb-4">Detalhes da Reserva</h3>
+            <div className="bg-zinc-900 rounded-lg p-5 border border-zinc-800">
+              <h3 className="text-base font-semibold mb-3">Detalhes da Reserva</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-400">Nome:</span>
