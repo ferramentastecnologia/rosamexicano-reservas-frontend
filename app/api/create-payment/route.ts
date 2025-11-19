@@ -133,13 +133,27 @@ export async function POST(request: Request) {
 
     console.log('Reserva criada:', reservation.id);
 
-    // 5. Retornar URL de pagamento
+    // 5. Retornar dados do PIX para checkout transparente
+    console.log('Pagamento PIX criado com sucesso');
+    console.log('PIX QR Code:', payment.encodedImage ? 'Presente' : 'Ausente');
+    console.log('PIX Copy/Paste:', payment.payload ? 'Presente' : 'Ausente');
+
     return NextResponse.json({
       success: true,
       reservationId: reservation.id,
       paymentId: payment.id,
-      invoiceUrl: payment.invoiceUrl,
-      bankSlipUrl: payment.bankSlipUrl,
+      pixQrCode: payment.payload || payment.pixQrCodeCopyPaste, // Código PIX para gerar QR Code
+      pixCopyPaste: payment.payload || payment.pixQrCodeCopyPaste, // Código PIX Copia e Cola
+      pixEncodedImage: payment.encodedImage, // QR Code base64 do Asaas (opcional)
+      expirationDate: payment.expirationDate || dueDate.toISOString(),
+      reservationData: {
+        nome,
+        email,
+        telefone,
+        data: dataReserva,
+        horario,
+        numeroPessoas,
+      },
     });
 
   } catch (error) {

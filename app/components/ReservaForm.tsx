@@ -59,9 +59,10 @@ export default function ReservaForm() {
 
       const result = await response.json();
 
-      if (result.success && result.invoiceUrl) {
-        // Redirecionar para página de pagamento do Asaas
-        window.location.href = result.invoiceUrl;
+      if (result.success && result.pixQrCode) {
+        // Redirecionar para nossa página de pagamento transparente
+        const paymentData = encodeURIComponent(JSON.stringify(result));
+        window.location.href = `/pagamento?data=${paymentData}`;
       } else {
         alert('Erro ao processar reserva. Tente novamente.');
         setLoading(false);
