@@ -61,12 +61,14 @@ export default function AdminTables() {
     // Definir data de hoje como padrão
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (selectedDate && selectedTime) {
       loadOccupancy();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, selectedTime]);
 
   const loadOccupancy = async () => {

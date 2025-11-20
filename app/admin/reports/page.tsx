@@ -14,7 +14,8 @@ export default function AdminReports() {
     if (!token) {
       router.push('/admin');
     }
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');

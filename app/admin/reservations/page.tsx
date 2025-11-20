@@ -52,10 +52,12 @@ export default function AdminReservations() {
     }
 
     loadReservations();
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     filterReservations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, statusFilter, reservations]);
 
   const loadReservations = async () => {

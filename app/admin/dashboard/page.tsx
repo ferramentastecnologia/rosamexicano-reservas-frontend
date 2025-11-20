@@ -43,7 +43,8 @@ export default function AdminDashboard() {
     }
 
     loadStats();
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadStats = async () => {
     try {
