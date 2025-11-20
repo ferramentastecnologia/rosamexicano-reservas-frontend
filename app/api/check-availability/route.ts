@@ -17,13 +17,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar TODAS as reservas da DATA (não apenas do horário)
+    // Buscar TODAS as reservas CONFIRMADAS da DATA
+    // Apenas reservas com pagamento confirmado contam para disponibilidade
     const reservations = await prisma.reservation.findMany({
       where: {
         data: data,
-        status: {
-          in: ['pending', 'confirmed'] // Considera pendentes e confirmadas
-        }
+        status: 'confirmed' // Apenas confirmadas bloqueiam capacidade
       },
       select: {
         numeroPessoas: true,

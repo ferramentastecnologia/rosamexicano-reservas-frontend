@@ -15,14 +15,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar TODAS as reservas da DATA (não apenas do horário específico)
-    // As mesas são compartilhadas entre todos os horários do dia
+    // Buscar TODAS as reservas CONFIRMADAS da DATA
+    // Apenas reservas com pagamento confirmado bloqueiam mesas
     const reservations = await prisma.reservation.findMany({
       where: {
         data: data,
-        status: {
-          in: ['pending', 'confirmed']
-        }
+        status: 'confirmed' // Apenas confirmadas bloqueiam mesas
       },
       select: {
         mesasSelecionadas: true,

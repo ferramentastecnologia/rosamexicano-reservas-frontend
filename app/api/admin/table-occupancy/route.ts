@@ -14,13 +14,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar todas as reservas para a DATA (independente do horário)
-    // As mesas são compartilhadas entre todos os horários do dia
+    // Buscar todas as reservas CONFIRMADAS para a DATA
+    // Apenas reservas confirmadas (com pagamento) aparecem no mapa
     const whereClause: any = {
       data,
-      status: {
-        in: ['pending', 'confirmed']
-      }
+      status: 'confirmed' // Apenas confirmadas
     };
 
     // Se horário for fornecido, filtra também por horário (apenas para visualização)
