@@ -82,9 +82,11 @@ export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect 
     });
   };
 
-  const mesasNecessarias = Math.ceil(numeroPessoas / 4);
+  // Validação segura de numeroPessoas
+  const pessoasValidas = numeroPessoas && !isNaN(numeroPessoas) && numeroPessoas > 0;
+  const mesasNecessarias = pessoasValidas ? Math.ceil(numeroPessoas / 4) : 0;
   const capacidadeSelecionada = selectedTables.length * 4;
-  const selecaoCompleta = selectedTables.length === mesasNecessarias;
+  const selecaoCompleta = mesasNecessarias > 0 && selectedTables.length === mesasNecessarias;
 
   if (!data || !horario) {
     return (
@@ -96,7 +98,7 @@ export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect 
     );
   }
 
-  if (numeroPessoas === 0 || isNaN(numeroPessoas)) {
+  if (!pessoasValidas) {
     return (
       <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
         <p className="text-zinc-400 text-center">
