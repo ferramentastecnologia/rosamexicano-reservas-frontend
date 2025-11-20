@@ -51,3 +51,14 @@ model Voucher {
   @@index([codigo])
   @@index([utilizado])
 }
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
