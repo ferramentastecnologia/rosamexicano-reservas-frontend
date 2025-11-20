@@ -7,22 +7,29 @@ export async function POST(request: Request) {
   try {
     const { data, horario } = await request.json();
 
-    if (!data || !horario) {
+    if (!data) {
       return NextResponse.json(
-        { error: 'Data e horário são obrigatórios' },
+        { error: 'Data é obrigatória' },
         { status: 400 }
       );
     }
 
-    // Buscar todas as reservas para a data e horário
+    // Buscar todas as reservas para a DATA (independente do horário)
+    // As mesas são compartilhadas entre todos os horários do dia
+    const whereClause: any = {
+      data,
+      status: {
+        in: ['pending', 'confirmed']
+      }
+    };
+
+    // Se horário for fornecido, filtra também por horário (apenas para visualização)
+    if (horario) {
+      whereClause.horario = horario;
+    }
+
     const reservations = await prisma.reservation.findMany({
-      where: {
-        data,
-        horario,
-        status: {
-          in: ['pending', 'confirmed']
-        }
-      },
+      where: whereClause,
       select: {
         id: true,
         externalRef: true,
@@ -30,27 +37,29 @@ export async function POST(request: Request) {
         numeroPessoas: true,
         mesasSelecionadas: true,
         status: true,
+        horario: true,
       }
     });
 
     // Criar mapa de mesas com informações
-    const tableMap = new Map<number, any>();
+    // Uma mesa pode ter múltiplas reservas (diferentes horários)
+    const tableMap = new Map<number, any[]>();
 
     reservations.forEach(reservation => {
       if (reservation.mesasSelecionadas) {
         try {
           const tables = JSON.parse(reservation.mesasSelecionadas);
           tables.forEach((tableNum: number) => {
-            tableMap.set(tableNum, {
-              tableNumber: tableNum,
-              occupied: true,
-              reservation: {
-                id: reservation.id,
-                code: reservation.externalRef,
-                name: reservation.nome,
-                people: reservation.numeroPessoas,
-                status: reservation.status,
-              }
+            if (!tableMap.has(tableNum)) {
+              tableMap.set(tableNum, []);
+            }
+            tableMap.get(tableNum)!.push({
+              id: reservation.id,
+              code: reservation.externalRef,
+              name: reservation.nome,
+              people: reservation.numeroPessoas,
+              status: reservation.status,
+              horario: reservation.horario,
             });
           });
         } catch (e) {
@@ -62,11 +71,22 @@ export async function POST(request: Request) {
     // Criar array completo de mesas (1-15)
     const tables = Array.from({ length: TOTAL_TABLES }, (_, i) => {
       const tableNumber = i + 1;
-      const tableInfo = tableMap.get(tableNumber);
+      const reservationsForTable = tableMap.get(tableNumber);
 
-      return tableInfo || {
+      if (reservationsForTable && reservationsForTable.length > 0) {
+        return {
+          tableNumber,
+          occupied: true,
+          reservations: reservationsForTable,
+          // Para compatibilidade, manter a primeira reserva como "reservation"
+          reservation: reservationsForTable[0],
+        };
+      }
+
+      return {
         tableNumber,
         occupied: false,
+        reservations: [],
         reservation: null,
       };
     });

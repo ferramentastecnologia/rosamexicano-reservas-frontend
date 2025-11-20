@@ -14,19 +14,25 @@ import {
   Clock,
   Users,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  RefreshCw,
+  X
 } from 'lucide-react';
+
+type Reservation = {
+  id: string;
+  code: string;
+  name: string;
+  people: number;
+  status: string;
+  horario: string;
+};
 
 type TableInfo = {
   tableNumber: number;
   occupied: boolean;
-  reservation: {
-    id: string;
-    code: string;
-    name: string;
-    people: number;
-    status: string;
-  } | null;
+  reservation: Reservation | null;
+  reservations: Reservation[];
 };
 
 type OccupancyData = {
@@ -166,7 +172,10 @@ export default function AdminTables() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Mapa de Mesas</h1>
-          <p className="text-zinc-400">Visualize a ocupação das mesas por data e horário</p>
+          <p className="text-zinc-400">
+            Visualize a ocupação das mesas por data.
+            <span className="text-orange-400 ml-2">Limite: 15 mesas e 60 pessoas por dia</span>
+          </p>
         </div>
 
         {/* Filters */}
@@ -204,9 +213,10 @@ export default function AdminTables() {
             <div className="flex items-end">
               <button
                 onClick={loadOccupancy}
-                className="w-full px-4 py-2 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition"
+                className="w-full px-4 py-2 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition flex items-center justify-center gap-2"
               >
-                🔄 Atualizar
+                <RefreshCw className="w-4 h-4" />
+                Atualizar
               </button>
             </div>
           </div>
@@ -265,15 +275,18 @@ export default function AdminTables() {
         ) : occupancyData ? (
           <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">
-                Mesas - {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR')} às {selectedTime}
+              <h2 className="text-xl font-semibold mb-2">
+                Mesas - {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR')}
               </h2>
+              <p className="text-sm text-zinc-400 mb-4">
+                Mostrando reservas de {selectedTime} • As mesas são compartilhadas por TODOS os horários do dia
+              </p>
 
               {/* Legend */}
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-green-900/30 border border-green-800 rounded"></div>
-                  <span className="text-zinc-400">Disponível</span>
+                  <span className="text-zinc-400">Disponível no dia</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-yellow-900/30 border border-yellow-800 rounded"></div>
@@ -329,30 +342,42 @@ export default function AdminTables() {
                   onClick={() => setSelectedTable(null)}
                   className="text-zinc-400 hover:text-white"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {selectedTable.occupied && selectedTable.reservation ? (
+              {selectedTable.occupied && selectedTable.reservations && selectedTable.reservations.length > 0 ? (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm text-zinc-400">Status</label>
-                    <div className="mt-1">{getStatusBadge(selectedTable.reservation.status)}</div>
+                  <div className="bg-orange-900/20 border border-orange-800 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-orange-400">
+                      Esta mesa possui {selectedTable.reservations.length} reserva(s) neste dia
+                    </p>
                   </div>
 
-                  <div>
-                    <label className="text-sm text-zinc-400">Código da Reserva</label>
-                    <p className="font-medium font-mono">{selectedTable.reservation.code}</p>
-                  </div>
+                  <div className="max-h-96 overflow-y-auto space-y-4">
+                    {selectedTable.reservations.map((reservation, index) => (
+                      <div key={index} className="bg-black/50 rounded-lg p-4 border border-zinc-700">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm font-medium text-zinc-400">Horário: {reservation.horario}</span>
+                          {getStatusBadge(reservation.status)}
+                        </div>
 
-                  <div>
-                    <label className="text-sm text-zinc-400">Cliente</label>
-                    <p className="font-medium">{selectedTable.reservation.name}</p>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-zinc-400">Número de Pessoas</label>
-                    <p className="font-medium">{selectedTable.reservation.people}</p>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="text-zinc-400">Código:</span>
+                            <span className="ml-2 font-mono font-medium">{reservation.code}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-400">Cliente:</span>
+                            <span className="ml-2 font-medium">{reservation.name}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-400">Pessoas:</span>
+                            <span className="ml-2 font-medium">{reservation.people}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <Link
@@ -360,7 +385,7 @@ export default function AdminTables() {
                     className="block w-full mt-4 px-4 py-2 bg-[#E53935] hover:bg-[#B71C1C] text-center rounded-lg transition"
                     onClick={() => setSelectedTable(null)}
                   >
-                    Ver Detalhes da Reserva
+                    Ver Todas as Reservas
                   </Link>
                 </div>
               ) : (
@@ -368,7 +393,7 @@ export default function AdminTables() {
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                   <p className="text-lg font-semibold mb-2">Mesa Disponível</p>
                   <p className="text-zinc-400 text-sm">
-                    Esta mesa está livre para este horário
+                    Esta mesa está livre neste dia
                   </p>
                   <div className="mt-4 p-4 bg-black rounded-lg">
                     <p className="text-sm text-zinc-400">Capacidade</p>

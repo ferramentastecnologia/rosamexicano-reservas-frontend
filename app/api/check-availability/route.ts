@@ -10,18 +10,17 @@ export async function POST(request: Request) {
   try {
     const { data, horario, numeroPessoas } = await request.json();
 
-    if (!data || !horario || !numeroPessoas) {
+    if (!data || !numeroPessoas) {
       return NextResponse.json(
         { available: false, error: 'Dados incompletos' },
         { status: 400 }
       );
     }
 
-    // Buscar todas as reservas confirmadas para a data e horário
+    // Buscar TODAS as reservas da DATA (não apenas do horário)
     const reservations = await prisma.reservation.findMany({
       where: {
         data: data,
-        horario: horario,
         status: {
           in: ['pending', 'confirmed'] // Considera pendentes e confirmadas
         }
@@ -31,10 +30,10 @@ export async function POST(request: Request) {
       }
     });
 
-    // Calcular total de pessoas já reservadas
+    // Calcular total de pessoas já reservadas NA DATA
     const totalReserved = reservations.reduce((sum, r) => sum + r.numeroPessoas, 0);
 
-    // Calcular se há capacidade disponível
+    // Calcular se há capacidade disponível NA DATA
     const availableCapacity = MAX_CAPACITY - totalReserved;
     const canAccommodate = availableCapacity >= numeroPessoas;
 

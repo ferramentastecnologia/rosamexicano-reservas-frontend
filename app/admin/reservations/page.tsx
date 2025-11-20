@@ -15,7 +15,9 @@ import {
   LogOut,
   LayoutDashboard,
   List,
-  BarChart3
+  BarChart3,
+  RefreshCw,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -203,9 +205,10 @@ export default function AdminReservations() {
           <h1 className="text-3xl font-bold">Reservas</h1>
           <button
             onClick={loadReservations}
-            className="px-4 py-2 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition"
+            className="px-4 py-2 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition flex items-center gap-2"
           >
-            🔄 Atualizar
+            <RefreshCw className="w-4 h-4" />
+            Atualizar
           </button>
         </div>
 
@@ -345,7 +348,7 @@ export default function AdminReservations() {
                   onClick={() => setSelectedReservation(null)}
                   className="text-zinc-400 hover:text-white"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
