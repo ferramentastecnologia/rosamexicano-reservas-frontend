@@ -7,8 +7,12 @@ const MAX_TABLES = TOTAL_TABLES; // 49 mesas
 const MAX_CAPACITY = TOTAL_CAPACITY; // ~216 pessoas
 
 export async function POST(request: Request) {
+  let numeroPessoas = 0;
+
   try {
-    const { data, horario, numeroPessoas } = await request.json();
+    const body = await request.json();
+    const { data, horario } = body;
+    numeroPessoas = body.numeroPessoas;
 
     if (!data || !numeroPessoas) {
       return NextResponse.json(
