@@ -62,7 +62,7 @@ export default function ReservaForm() {
 
     try {
       // Primeiro, verificar disponibilidade
-      const availabilityResponse = await fetch('/api/check-availability', {
+      const availabilityResponse = await fetch('app/api/check-availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
