@@ -117,13 +117,17 @@ export default function AdminReservations() {
   const getStatusBadge = (status: string) => {
     const styles = {
       pending: 'bg-yellow-900/30 text-yellow-400 border-yellow-800',
-      confirmed: 'bg-green-900/30 text-green-400 border-green-800',
-      cancelled: 'bg-red-900/30 text-red-400 border-red-800',
+      confirmed: 'bg-blue-900/30 text-blue-400 border-blue-800',
+      approved: 'bg-green-900/30 text-green-400 border-green-800',
+      rejected: 'bg-red-900/30 text-red-400 border-red-800',
+      cancelled: 'bg-zinc-900/30 text-zinc-400 border-zinc-800',
     };
 
     const labels = {
-      pending: 'Pendente',
-      confirmed: 'Confirmada',
+      pending: 'Aguardando Pagamento',
+      confirmed: 'Pago - Aguardando Aprovação',
+      approved: 'Aprovada',
+      rejected: 'Rejeitada',
       cancelled: 'Cancelada',
     };
 
@@ -252,8 +256,10 @@ export default function AdminReservations() {
                   className="w-full pl-10 pr-4 py-2 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
                 >
                   <option value="all">Todos</option>
-                  <option value="pending">Pendentes</option>
-                  <option value="confirmed">Confirmadas</option>
+                  <option value="pending">Aguardando Pagamento</option>
+                  <option value="confirmed">Aguardando Aprovação</option>
+                  <option value="approved">Aprovadas</option>
+                  <option value="rejected">Rejeitadas</option>
                   <option value="cancelled">Canceladas</option>
                 </select>
               </div>
@@ -318,23 +324,23 @@ export default function AdminReservations() {
                             >
                               <Eye className="w-4 h-4 text-blue-400" />
                             </button>
-                            {reservation.status === 'pending' && (
-                              <button
-                                onClick={() => updateStatus(reservation.id, 'confirmed')}
-                                className="p-2 bg-green-900/30 hover:bg-green-900/50 rounded transition"
-                                title="Confirmar"
-                              >
-                                <CheckCircle className="w-4 h-4 text-green-400" />
-                              </button>
-                            )}
-                            {reservation.status !== 'cancelled' && (
-                              <button
-                                onClick={() => updateStatus(reservation.id, 'cancelled')}
-                                className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded transition"
-                                title="Cancelar"
-                              >
-                                <XCircle className="w-4 h-4 text-red-400" />
-                              </button>
+                            {reservation.status === 'confirmed' && (
+                              <>
+                                <button
+                                  onClick={() => updateStatus(reservation.id, 'approved')}
+                                  className="p-2 bg-green-900/30 hover:bg-green-900/50 rounded transition"
+                                  title="Aprovar Reserva"
+                                >
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                </button>
+                                <button
+                                  onClick={() => updateStatus(reservation.id, 'rejected')}
+                                  className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded transition"
+                                  title="Rejeitar Reserva"
+                                >
+                                  <XCircle className="w-4 h-4 text-red-400" />
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>
@@ -438,27 +444,27 @@ export default function AdminReservations() {
               </div>
 
               <div className="mt-6 flex gap-3">
-                {selectedReservation.status === 'pending' && (
-                  <button
-                    onClick={() => {
-                      updateStatus(selectedReservation.id, 'confirmed');
-                      setSelectedReservation(null);
-                    }}
-                    className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
-                  >
-                    Confirmar Reserva
-                  </button>
-                )}
-                {selectedReservation.status !== 'cancelled' && (
-                  <button
-                    onClick={() => {
-                      updateStatus(selectedReservation.id, 'cancelled');
-                      setSelectedReservation(null);
-                    }}
-                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
-                  >
-                    Cancelar Reserva
-                  </button>
+                {selectedReservation.status === 'confirmed' && (
+                  <>
+                    <button
+                      onClick={() => {
+                        updateStatus(selectedReservation.id, 'approved');
+                        setSelectedReservation(null);
+                      }}
+                      className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
+                    >
+                      Aprovar Reserva
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateStatus(selectedReservation.id, 'rejected');
+                        setSelectedReservation(null);
+                      }}
+                      className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+                    >
+                      Rejeitar Reserva
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={() => setSelectedReservation(null)}
