@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateVoucherCode, generateQRCodeData, getExpiryDate } from '@/lib/voucher-helpers';
-import { generateVoucherPDF } from '@/lib/pdf-generator';
-import { sendVoucherEmail } from '@/lib/email-sender';
 
 export async function POST(request: Request) {
   try {
@@ -64,28 +62,15 @@ export async function POST(request: Request) {
         data: { status: 'confirmed' },
       });
 
-      // 5. Gerar PDF
-      const pdfBuffer = await generateVoucherPDF(voucher);
-      console.log('PDF gerado, tamanho:', pdfBuffer.length);
+      console.log('Reserva confirmada com sucesso!');
 
-      // 6. Enviar email
-      const emailSent = await sendVoucherEmail(
-        reservation.email,
-        voucher,
-        pdfBuffer
-      );
-
-      if (emailSent) {
-        console.log('Email enviado com sucesso para:', reservation.email);
-      } else {
-        console.error('Falha ao enviar email');
-      }
+      // TODO: Adicionar envio de email quando configurado
+      // Por enquanto, apenas confirma a reserva
 
       return NextResponse.json({
         received: true,
         voucherCode: voucher.codigo,
         reservationId: reservation.id,
-        emailSent: emailSent,
       });
     }
 
