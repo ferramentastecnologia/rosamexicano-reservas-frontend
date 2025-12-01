@@ -118,8 +118,17 @@ function PagamentoContent() {
     }
   }, [searchParams]);
 
-  // Countdown
+  // Countdown e cancelamento por expiração
   useEffect(() => {
+    if (timeLeft === 0 && paymentData?.paymentId && !paymentConfirmed) {
+      // Timer zerou - cancelar reserva
+      fetch('/api/cancel-expired-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: paymentData.paymentId }),
+      }).catch(err => console.error('Erro ao cancelar reserva expirada:', err));
+    }
+
     if (!timeLeft) return;
 
     const timer = setInterval(() => {
@@ -127,7 +136,7 @@ function PagamentoContent() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, paymentData, paymentConfirmed]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -176,6 +185,25 @@ function PagamentoContent() {
           <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4 animate-pulse" />
           <h2 className="text-2xl font-bold text-green-500 mb-2">Pagamento Confirmado!</h2>
           <p className="text-zinc-400">Redirecionando para a confirmação...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela de tempo expirado
+  if (timeLeft === 0) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <Clock className="w-20 h-20 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-red-500 mb-2">Tempo Expirado!</h2>
+          <p className="text-zinc-400 mb-6">O tempo para pagamento expirou e a reserva foi cancelada.</p>
+          <a
+            href="/"
+            className="inline-block px-6 py-3 bg-[#E53935] hover:bg-[#B71C1C] rounded-lg transition"
+          >
+            Fazer Nova Reserva
+          </a>
         </div>
       </div>
     );

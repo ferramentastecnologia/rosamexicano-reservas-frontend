@@ -10,6 +10,141 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Email de reserva aprovada
+export async function sendApprovalEmail(reservation: any): Promise<boolean> {
+  try {
+    const { nome, email, data, horario, numeroPessoas } = reservation;
+    const dataFormatada = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const mailOptions = {
+      from: `"Rosa Mexicano" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `✅ Reserva Aprovada - ${dataFormatada} às ${horario}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .detail-row { padding: 10px 0; border-bottom: 1px solid #eee; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Reserva Aprovada!</h1>
+              <p>Rosa Mexicano</p>
+            </div>
+            <div class="content">
+              <p>Olá <strong>${nome}</strong>,</p>
+              <p>Ótima notícia! Sua reserva foi <strong>aprovada</strong> pelo restaurante.</p>
+
+              <div class="details">
+                <h3 style="margin-top: 0; color: #E53935;">📋 Detalhes da Reserva</h3>
+                <div class="detail-row">📅 Data: <strong>${dataFormatada}</strong></div>
+                <div class="detail-row">🕐 Horário: <strong>${horario}</strong></div>
+                <div class="detail-row" style="border-bottom: none;">👥 Pessoas: <strong>${numeroPessoas}</strong></div>
+              </div>
+
+              <p><strong>Importante:</strong></p>
+              <ul>
+                <li>Chegue com 10 minutos de antecedência</li>
+                <li>O valor de R$ 50,00 será convertido em consumação</li>
+              </ul>
+
+              <p>Esperamos você! 🌮</p>
+            </div>
+            <div class="footer">
+              <p><strong>Rosa Mexicano</strong></p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('Email de aprovação enviado para:', email);
+    return true;
+  } catch (error) {
+    console.error('Erro ao enviar email de aprovação:', error);
+    return false;
+  }
+}
+
+// Email de reserva rejeitada
+export async function sendRejectionEmail(reservation: any): Promise<boolean> {
+  try {
+    const { nome, email, data, horario } = reservation;
+    const dataFormatada = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const mailOptions = {
+      from: `"Rosa Mexicano" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `❌ Reserva não aprovada - ${dataFormatada} às ${horario}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #666 0%, #333 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Reserva não aprovada</h1>
+              <p>Rosa Mexicano</p>
+            </div>
+            <div class="content">
+              <p>Olá <strong>${nome}</strong>,</p>
+              <p>Infelizmente não foi possível aprovar sua reserva para <strong>${dataFormatada}</strong> às <strong>${horario}</strong>.</p>
+
+              <p>O valor pago será estornado em até 5 dias úteis.</p>
+
+              <p>Pedimos desculpas pelo inconveniente. Entre em contato conosco para mais informações ou para reagendar.</p>
+
+              <p>Atenciosamente,<br>Equipe Rosa Mexicano</p>
+            </div>
+            <div class="footer">
+              <p><strong>Rosa Mexicano</strong></p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('Email de rejeição enviado para:', email);
+    return true;
+  } catch (error) {
+    console.error('Erro ao enviar email de rejeição:', error);
+    return false;
+  }
+}
+
 export async function sendVoucherEmail(
   to: string,
   voucherData: any,

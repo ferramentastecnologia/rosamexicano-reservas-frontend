@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendApprovalEmail, sendRejectionEmail } from '@/lib/email-sender';
 
 export async function PATCH(
   request: Request,
@@ -13,6 +14,17 @@ export async function PATCH(
       where: { id },
       data: { status }
     });
+
+    // Enviar email de notificação (não bloqueia a resposta)
+    if (status === 'approved') {
+      sendApprovalEmail(reservation).catch(err =>
+        console.error('Erro ao enviar email de aprovação:', err)
+      );
+    } else if (status === 'rejected') {
+      sendRejectionEmail(reservation).catch(err =>
+        console.error('Erro ao enviar email de rejeição:', err)
+      );
+    }
 
     return NextResponse.json(reservation);
   } catch (error) {
