@@ -31,21 +31,33 @@ export async function POST(
 
     // Verificar expiração baseada na data/horário da reserva
     if (voucher.reservation) {
-      const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
-      const reservationDate = new Date(voucher.reservation.data + 'T00:00:00');
-      reservationDate.setHours(hours, minutes, 0, 0);
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      const reservationDateStr = voucher.reservation.data;
 
-      // Margem de 3 horas após o horário da reserva
-      const expirationDate = new Date(reservationDate.getTime() + 3 * 60 * 60 * 1000);
-
-      if (new Date() > expirationDate) {
+      // Se a data da reserva é anterior a hoje, está expirado
+      if (reservationDateStr < todayStr) {
         return NextResponse.json(
           { error: 'Voucher expirado - data da reserva já passou' },
           { status: 400 }
         );
       }
+
+      // Se é o mesmo dia, verificar horário (com margem de 3h)
+      if (reservationDateStr === todayStr) {
+        const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
+        const reservationTime = hours * 60 + minutes;
+        const currentTime = today.getHours() * 60 + today.getMinutes();
+        const marginMinutes = 3 * 60;
+
+        if (currentTime > reservationTime + marginMinutes) {
+          return NextResponse.json(
+            { error: 'Voucher expirado - horário da reserva já passou' },
+            { status: 400 }
+          );
+        }
+      }
     } else if (new Date() > new Date(voucher.dataValidade)) {
-      // Fallback para dataValidade caso não tenha reserva
       return NextResponse.json(
         { error: 'Voucher expirado' },
         { status: 400 }

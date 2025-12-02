@@ -22,7 +22,8 @@ import {
   AlertCircle,
   Loader2,
   Printer,
-  CalendarDays
+  CalendarDays,
+  FileSpreadsheet
 } from 'lucide-react';
 
 type ReservaDetalhe = {
@@ -42,6 +43,7 @@ type VoucherDetalhe = {
   codigo: string;
   valor: number;
   utilizado: boolean;
+  expirado: boolean;
   dataUtilizacao: string | null;
   cliente: string;
 };
@@ -120,6 +122,54 @@ export default function AdminReports() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const exportToExcel = () => {
+    if (!data) return;
+
+    let csvContent = '';
+
+    // Se for relatório diário com lista de reservas
+    if (data.listaReservas && data.listaReservas.length > 0) {
+      csvContent += 'RESERVAS\n';
+      csvContent += 'Horário;Cliente;Telefone;Email;Pessoas;Mesa;Valor;Status;Voucher\n';
+
+      data.listaReservas
+        .sort((a, b) => a.horario.localeCompare(b.horario))
+        .forEach(r => {
+          const mesa = r.mesasSelecionadas ? JSON.parse(r.mesasSelecionadas).join(', ') : '-';
+          const voucher = r.voucher ? r.voucher.codigo : '-';
+          csvContent += `${r.horario};${r.nome};${r.telefone};${r.email};${r.numeroPessoas};${mesa};${r.valor.toFixed(2)};${getStatusLabel(r.status)};${voucher}\n`;
+        });
+
+      csvContent += '\n';
+    }
+
+    // Se tiver lista de vouchers
+    if (data.listaVouchers && data.listaVouchers.length > 0) {
+      csvContent += 'VOUCHERS\n';
+      csvContent += 'Código;Cliente;Valor;Status\n';
+
+      data.listaVouchers.forEach(v => {
+        const status = v.utilizado ? 'Utilizado' : v.expirado ? 'Expirado' : 'Disponível';
+        csvContent += `${v.codigo};${v.cliente};${v.valor.toFixed(2)};${status}\n`;
+      });
+    }
+
+    // Criar e baixar arquivo
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const fileName = tipoRelatorio === 'diario'
+      ? `relatorio-${dataEspecifica}.csv`
+      : `relatorio-${periodo}dias.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleLogout = () => {
@@ -265,7 +315,16 @@ export default function AdminReports() {
               className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg px-4 py-2 text-white transition"
             >
               <Printer className="w-4 h-4" />
-              Imprimir
+              PDF
+            </button>
+
+            {/* Botão Excel */}
+            <button
+              onClick={exportToExcel}
+              className="flex items-center gap-2 bg-green-800 hover:bg-green-700 border border-green-700 rounded-lg px-4 py-2 text-white transition"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              Excel
             </button>
           </div>
         </div>
@@ -536,51 +595,38 @@ export default function AdminReports() {
 
             {/* Lista Detalhada de Reservas - Apenas para relatório diário */}
             {data.listaReservas && data.listaReservas.length > 0 && (
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-                <h2 className="text-xl font-semibold mb-6 print:text-black">Lista de Reservas</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300 print:p-2 print:break-inside-avoid">
+                <h2 className="text-xl font-semibold mb-6 print:text-black print:text-base print:mb-2">Lista de Reservas ({data.listaReservas.length})</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-zinc-800 print:bg-gray-100">
+                  <table className="w-full text-sm print:text-xs">
+                    <thead className="bg-zinc-800 print:bg-gray-200">
                       <tr>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Horário</th>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Cliente</th>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Contato</th>
-                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Pessoas</th>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Mesa</th>
-                        <th className="px-3 py-2 text-right text-zinc-400 print:text-gray-600">Valor</th>
-                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Status</th>
-                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Voucher</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Hora</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Cliente</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Telefone</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-black print:px-1 print:py-1">Pax</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Mesa</th>
+                        <th className="px-3 py-2 text-right text-zinc-400 print:text-black print:px-1 print:py-1">Valor</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-black print:px-1 print:py-1">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800 print:divide-gray-200">
+                    <tbody className="divide-y divide-zinc-800 print:divide-gray-300">
                       {data.listaReservas
                         .sort((a, b) => a.horario.localeCompare(b.horario))
                         .map((reserva) => (
                           <tr key={reserva.id} className="print:text-black">
-                            <td className="px-3 py-2 font-medium">{reserva.horario}</td>
-                            <td className="px-3 py-2">{reserva.nome}</td>
-                            <td className="px-3 py-2">
-                              <div className="text-xs">
-                                <p>{reserva.telefone}</p>
-                                <p className="text-zinc-500 print:text-gray-500">{reserva.email}</p>
-                              </div>
-                            </td>
-                            <td className="px-3 py-2 text-center">{reserva.numeroPessoas}</td>
-                            <td className="px-3 py-2">
+                            <td className="px-3 py-2 font-medium print:px-1 print:py-1">{reserva.horario}</td>
+                            <td className="px-3 py-2 print:px-1 print:py-1 print:max-w-[120px] print:truncate">{reserva.nome}</td>
+                            <td className="px-3 py-2 print:px-1 print:py-1">{reserva.telefone}</td>
+                            <td className="px-3 py-2 text-center print:px-1 print:py-1">{reserva.numeroPessoas}</td>
+                            <td className="px-3 py-2 print:px-1 print:py-1">
                               {reserva.mesasSelecionadas
                                 ? JSON.parse(reserva.mesasSelecionadas).join(', ')
                                 : '-'}
                             </td>
-                            <td className="px-3 py-2 text-right font-medium">{formatCurrency(reserva.valor)}</td>
-                            <td className={`px-3 py-2 text-center font-medium ${getStatusColor(reserva.status)} print:text-black`}>
+                            <td className="px-3 py-2 text-right font-medium print:px-1 print:py-1">{formatCurrency(reserva.valor)}</td>
+                            <td className={`px-3 py-2 text-center font-medium ${getStatusColor(reserva.status)} print:text-black print:px-1 print:py-1`}>
                               {getStatusLabel(reserva.status)}
-                            </td>
-                            <td className="px-3 py-2 text-center">
-                              {reserva.voucher ? (
-                                <span className={`text-xs font-mono ${reserva.voucher.utilizado ? 'text-yellow-400 print:text-yellow-600' : 'text-green-400 print:text-green-600'}`}>
-                                  {reserva.voucher.codigo}
-                                </span>
-                              ) : '-'}
                             </td>
                           </tr>
                         ))}
@@ -592,31 +638,33 @@ export default function AdminReports() {
 
             {/* Lista Detalhada de Vouchers - Apenas para relatório diário */}
             {data.listaVouchers && data.listaVouchers.length > 0 && (
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-                <h2 className="text-xl font-semibold mb-6 print:text-black">Lista de Vouchers</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300 print:p-2 print:mt-4 print:break-inside-avoid">
+                <h2 className="text-xl font-semibold mb-6 print:text-black print:text-base print:mb-2">Lista de Vouchers ({data.listaVouchers.length})</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-zinc-800 print:bg-gray-100">
+                  <table className="w-full text-sm print:text-xs">
+                    <thead className="bg-zinc-800 print:bg-gray-200">
                       <tr>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Código</th>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Cliente</th>
-                        <th className="px-3 py-2 text-right text-zinc-400 print:text-gray-600">Valor</th>
-                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Status</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Código</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Cliente</th>
+                        <th className="px-3 py-2 text-right text-zinc-400 print:text-black print:px-1 print:py-1">Valor</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-black print:px-1 print:py-1">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800 print:divide-gray-200">
+                    <tbody className="divide-y divide-zinc-800 print:divide-gray-300">
                       {data.listaVouchers.map((voucher) => (
                         <tr key={voucher.codigo} className="print:text-black">
-                          <td className="px-3 py-2 font-mono font-medium">{voucher.codigo}</td>
-                          <td className="px-3 py-2">{voucher.cliente}</td>
-                          <td className="px-3 py-2 text-right font-medium text-[#E53935] print:text-red-600">
+                          <td className="px-3 py-2 font-mono font-medium print:px-1 print:py-1">{voucher.codigo}</td>
+                          <td className="px-3 py-2 print:px-1 print:py-1">{voucher.cliente}</td>
+                          <td className="px-3 py-2 text-right font-medium text-[#E53935] print:text-black print:px-1 print:py-1">
                             {formatCurrency(voucher.valor)}
                           </td>
-                          <td className="px-3 py-2 text-center">
+                          <td className="px-3 py-2 text-center print:px-1 print:py-1">
                             {voucher.utilizado ? (
-                              <span className="text-yellow-400 print:text-yellow-600">Utilizado</span>
+                              <span className="text-yellow-400 print:text-black">Utilizado</span>
+                            ) : voucher.expirado ? (
+                              <span className="text-red-400 print:text-black">Expirado</span>
                             ) : (
-                              <span className="text-green-400 print:text-green-600">Disponível</span>
+                              <span className="text-green-400 print:text-black">Disponível</span>
                             )}
                           </td>
                         </tr>

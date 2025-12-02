@@ -165,15 +165,29 @@ export default function VouchersPage() {
   const isExpired = (voucher: VoucherData) => {
     if (!voucher.reservation?.data || !voucher.reservation?.horario) return false;
 
-    // Combinar data e horário da reserva
-    const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
-    const reservationDate = new Date(voucher.reservation.data + 'T00:00:00');
-    reservationDate.setHours(hours, minutes, 0, 0);
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    const reservationDateStr = voucher.reservation.data; // YYYY-MM-DD
 
-    // Adicionar margem de 3 horas após o horário da reserva
-    const expirationDate = new Date(reservationDate.getTime() + 3 * 60 * 60 * 1000);
+    // Se a data da reserva é anterior a hoje, está expirado
+    if (reservationDateStr < todayStr) {
+      return true;
+    }
 
-    return new Date() > expirationDate;
+    // Se é o mesmo dia, verificar horário (com margem de 3h)
+    if (reservationDateStr === todayStr) {
+      const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
+      const reservationTime = hours * 60 + minutes; // minutos desde meia-noite
+      const currentTime = today.getHours() * 60 + today.getMinutes();
+      const marginMinutes = 3 * 60; // 3 horas em minutos
+
+      // Expirado se passou 3h do horário da reserva
+      if (currentTime > reservationTime + marginMinutes) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
   const getVoucherStatus = (voucher: VoucherData): 'used' | 'expired' | 'available' => {

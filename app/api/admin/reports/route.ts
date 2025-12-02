@@ -207,13 +207,38 @@ export async function GET(request: Request) {
           utilizado: r.voucher.utilizado,
         } : null,
       })) : null,
-      listaVouchers: dataEspecifica ? vouchers.map(v => ({
-        codigo: v.codigo,
-        valor: v.valor,
-        utilizado: v.utilizado,
-        dataUtilizacao: v.dataUtilizacao,
-        cliente: v.reservation?.nome || '-',
-      })) : null,
+      listaVouchers: dataEspecifica ? vouchers.map(v => {
+        // Calcular se está expirado baseado na reserva
+        let expirado = false;
+        if (!v.utilizado && v.reservation) {
+          const today = new Date();
+          const todayStr = today.toISOString().split('T')[0];
+          const reservationDateStr = v.reservation.data;
+
+          if (reservationDateStr < todayStr) {
+            expirado = true;
+          } else if (reservationDateStr === todayStr && v.reservation.horario) {
+            const [hours, minutes] = v.reservation.horario.split(':').map(Number);
+            const reservationTime = hours * 60 + minutes;
+            const currentTime = today.getHours() * 60 + today.getMinutes();
+            const marginMinutes = 3 * 60;
+            if (currentTime > reservationTime + marginMinutes) {
+              expirado = true;
+            }
+          }
+        } else if (!v.utilizado && new Date(v.dataValidade) < new Date()) {
+          expirado = true;
+        }
+
+        return {
+          codigo: v.codigo,
+          valor: v.valor,
+          utilizado: v.utilizado,
+          expirado,
+          dataUtilizacao: v.dataUtilizacao,
+          cliente: v.reservation?.nome || '-',
+        };
+      }) : null,
     });
   } catch (error) {
     console.error('Erro ao gerar relatórios:', error);
