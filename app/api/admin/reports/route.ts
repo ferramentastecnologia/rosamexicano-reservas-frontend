@@ -5,19 +5,30 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const periodo = searchParams.get('periodo') || '30'; // dias
+    const dataEspecifica = searchParams.get('data'); // data específica YYYY-MM-DD
 
-    const diasAtras = parseInt(periodo);
-    const dataInicio = new Date();
-    dataInicio.setDate(dataInicio.getDate() - diasAtras);
-    const dataInicioStr = dataInicio.toISOString().split('T')[0];
+    let dataInicioStr: string;
+    let dataFimStr: string | null = null;
+    let diasAtras = 0;
+
+    if (dataEspecifica) {
+      // Relatório de um dia específico
+      dataInicioStr = dataEspecifica;
+      dataFimStr = dataEspecifica;
+      diasAtras = 1;
+    } else {
+      // Relatório de período
+      diasAtras = parseInt(periodo);
+      const dataInicio = new Date();
+      dataInicio.setDate(dataInicio.getDate() - diasAtras);
+      dataInicioStr = dataInicio.toISOString().split('T')[0];
+    }
 
     // Buscar todas as reservas do período
     const reservas = await prisma.reservation.findMany({
-      where: {
-        data: {
-          gte: dataInicioStr,
-        },
-      },
+      where: dataFimStr
+        ? { data: dataEspecifica! }
+        : { data: { gte: dataInicioStr } },
       include: {
         voucher: true,
       },
@@ -27,11 +38,22 @@ export async function GET(request: Request) {
     });
 
     // Buscar todos os vouchers do período
+    const voucherWhereClause = dataFimStr
+      ? {
+          reservation: {
+            data: dataEspecifica!,
+          },
+        }
+      : {
+          createdAt: {
+            gte: new Date(dataInicioStr + 'T00:00:00'),
+          },
+        };
+
     const vouchers = await prisma.voucher.findMany({
-      where: {
-        createdAt: {
-          gte: dataInicio,
-        },
+      where: voucherWhereClause,
+      include: {
+        reservation: true,
       },
     });
 
@@ -103,34 +125,40 @@ export async function GET(request: Request) {
       .reduce((acc, v) => acc + v.valor, 0);
 
     // === TENDÊNCIAS ===
-    // Comparar com período anterior
-    const dataAnteriorInicio = new Date(dataInicio);
-    dataAnteriorInicio.setDate(dataAnteriorInicio.getDate() - diasAtras);
-    const dataAnteriorInicioStr = dataAnteriorInicio.toISOString().split('T')[0];
+    let crescimentoFaturamento = '0';
+    let crescimentoReservas = '0';
 
-    const reservasAnteriores = await prisma.reservation.findMany({
-      where: {
-        data: {
-          gte: dataAnteriorInicioStr,
-          lt: dataInicioStr,
+    // Só calcular tendências para relatórios de período (não diários)
+    if (!dataEspecifica) {
+      const dataAnteriorInicio = new Date(dataInicioStr + 'T00:00:00');
+      dataAnteriorInicio.setDate(dataAnteriorInicio.getDate() - diasAtras);
+      const dataAnteriorInicioStr = dataAnteriorInicio.toISOString().split('T')[0];
+
+      const reservasAnteriores = await prisma.reservation.findMany({
+        where: {
+          data: {
+            gte: dataAnteriorInicioStr,
+            lt: dataInicioStr,
+          },
+          status: {
+            in: ['confirmed', 'approved'],
+          },
         },
-        status: {
-          in: ['confirmed', 'approved'],
-        },
-      },
-    });
+      });
 
-    const faturamentoAnterior = reservasAnteriores.reduce((acc, r) => acc + r.valor, 0);
-    const crescimentoFaturamento = faturamentoAnterior > 0
-      ? (((faturamentoTotal - faturamentoAnterior) / faturamentoAnterior) * 100).toFixed(1)
-      : '0';
+      const faturamentoAnterior = reservasAnteriores.reduce((acc, r) => acc + r.valor, 0);
+      crescimentoFaturamento = faturamentoAnterior > 0
+        ? (((faturamentoTotal - faturamentoAnterior) / faturamentoAnterior) * 100).toFixed(1)
+        : '0';
 
-    const crescimentoReservas = reservasAnteriores.length > 0
-      ? (((reservasConfirmadas.length - reservasAnteriores.length) / reservasAnteriores.length) * 100).toFixed(1)
-      : '0';
+      crescimentoReservas = reservasAnteriores.length > 0
+        ? (((reservasConfirmadas.length - reservasAnteriores.length) / reservasAnteriores.length) * 100).toFixed(1)
+        : '0';
+    }
 
     return NextResponse.json({
       periodo: diasAtras,
+      dataEspecifica: dataEspecifica || null,
       faturamento: {
         total: faturamentoTotal,
         porDia: faturamentoPorDia,
@@ -163,6 +191,29 @@ export async function GET(request: Request) {
           ? ((vouchersUtilizados / totalVouchers) * 100).toFixed(1)
           : '0',
       },
+      // Lista detalhada para relatório diário
+      listaReservas: dataEspecifica ? reservas.map(r => ({
+        id: r.id,
+        nome: r.nome,
+        email: r.email,
+        telefone: r.telefone,
+        horario: r.horario,
+        numeroPessoas: r.numeroPessoas,
+        valor: r.valor,
+        status: r.status,
+        mesasSelecionadas: r.mesasSelecionadas,
+        voucher: r.voucher ? {
+          codigo: r.voucher.codigo,
+          utilizado: r.voucher.utilizado,
+        } : null,
+      })) : null,
+      listaVouchers: dataEspecifica ? vouchers.map(v => ({
+        codigo: v.codigo,
+        valor: v.valor,
+        utilizado: v.utilizado,
+        dataUtilizacao: v.dataUtilizacao,
+        cliente: v.reservation?.nome || '-',
+      })) : null,
     });
   } catch (error) {
     console.error('Erro ao gerar relatórios:', error);

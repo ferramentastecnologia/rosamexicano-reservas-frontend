@@ -20,11 +20,35 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Printer,
+  CalendarDays
 } from 'lucide-react';
+
+type ReservaDetalhe = {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  horario: string;
+  numeroPessoas: number;
+  valor: number;
+  status: string;
+  mesasSelecionadas: string | null;
+  voucher: { codigo: string; utilizado: boolean } | null;
+};
+
+type VoucherDetalhe = {
+  codigo: string;
+  valor: number;
+  utilizado: boolean;
+  dataUtilizacao: string | null;
+  cliente: string;
+};
 
 type ReportData = {
   periodo: number;
+  dataEspecifica: string | null;
   faturamento: {
     total: number;
     porDia: { [key: string]: number };
@@ -53,12 +77,16 @@ type ReportData = {
     valorUtilizado: number;
     taxaUtilizacao: string;
   };
+  listaReservas: ReservaDetalhe[] | null;
+  listaVouchers: VoucherDetalhe[] | null;
 };
 
 export default function AdminReports() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [tipoRelatorio, setTipoRelatorio] = useState<'periodo' | 'diario'>('periodo');
   const [periodo, setPeriodo] = useState('30');
+  const [dataEspecifica, setDataEspecifica] = useState(new Date().toISOString().split('T')[0]);
   const [data, setData] = useState<ReportData | null>(null);
 
   useEffect(() => {
@@ -70,12 +98,15 @@ export default function AdminReports() {
 
   useEffect(() => {
     fetchReports();
-  }, [periodo]);
+  }, [periodo, tipoRelatorio, dataEspecifica]);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/reports?periodo=${periodo}`);
+      const url = tipoRelatorio === 'diario'
+        ? `/api/admin/reports?data=${dataEspecifica}`
+        : `/api/admin/reports?periodo=${periodo}`;
+      const response = await fetch(url);
       const result = await response.json();
       if (response.ok) {
         setData(result);
@@ -87,9 +118,35 @@ export default function AdminReports() {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     router.push('/admin');
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: { [key: string]: string } = {
+      pending: 'Pendente',
+      confirmed: 'Confirmada',
+      approved: 'Aprovada',
+      rejected: 'Rejeitada',
+      cancelled: 'Cancelada',
+    };
+    return labels[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: { [key: string]: string } = {
+      pending: 'text-yellow-400',
+      confirmed: 'text-blue-400',
+      approved: 'text-green-400',
+      rejected: 'text-red-400',
+      cancelled: 'text-zinc-400',
+    };
+    return colors[status] || 'text-zinc-400';
   };
 
   const formatCurrency = (value: number) => {
@@ -113,8 +170,8 @@ export default function AdminReports() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="bg-zinc-900 border-b border-zinc-800">
+    <div className="min-h-screen bg-black text-white print:bg-white print:text-black">
+      <header className="bg-zinc-900 border-b border-zinc-800 print:hidden">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -128,7 +185,7 @@ export default function AdminReports() {
         </div>
       </header>
 
-      <nav className="bg-zinc-900 border-b border-zinc-800">
+      <nav className="bg-zinc-900 border-b border-zinc-800 print:hidden">
         <div className="container mx-auto px-4">
           <div className="flex gap-6 overflow-x-auto">
             <Link href="/admin/dashboard" className="flex items-center gap-2 px-4 py-3 border-b-2 border-transparent text-zinc-400 hover:text-white transition whitespace-nowrap">
@@ -151,18 +208,84 @@ export default function AdminReports() {
       </nav>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        {/* Controles - Escondidos na impressão */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 print:hidden">
           <h1 className="text-3xl font-bold">Relatórios e Análises</h1>
-          <select
-            value={periodo}
-            onChange={(e) => setPeriodo(e.target.value)}
-            className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white"
-          >
-            <option value="7">Últimos 7 dias</option>
-            <option value="30">Últimos 30 dias</option>
-            <option value="60">Últimos 60 dias</option>
-            <option value="90">Últimos 90 dias</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Tipo de Relatório */}
+            <div className="flex bg-zinc-800 rounded-lg p-1">
+              <button
+                onClick={() => setTipoRelatorio('periodo')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                  tipoRelatorio === 'periodo'
+                    ? 'bg-[#E53935] text-white'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4 inline mr-2" />
+                Período
+              </button>
+              <button
+                onClick={() => setTipoRelatorio('diario')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                  tipoRelatorio === 'diario'
+                    ? 'bg-[#E53935] text-white'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <CalendarDays className="w-4 h-4 inline mr-2" />
+                Diário
+              </button>
+            </div>
+
+            {/* Seletor de período ou data */}
+            {tipoRelatorio === 'periodo' ? (
+              <select
+                value={periodo}
+                onChange={(e) => setPeriodo(e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white"
+              >
+                <option value="7">Últimos 7 dias</option>
+                <option value="30">Últimos 30 dias</option>
+                <option value="60">Últimos 60 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+            ) : (
+              <input
+                type="date"
+                value={dataEspecifica}
+                onChange={(e) => setDataEspecifica(e.target.value)}
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white"
+              />
+            )}
+
+            {/* Botão Imprimir */}
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg px-4 py-2 text-white transition"
+            >
+              <Printer className="w-4 h-4" />
+              Imprimir
+            </button>
+          </div>
+        </div>
+
+        {/* Cabeçalho para Impressão */}
+        <div className="hidden print:block mb-8">
+          <div className="flex items-center justify-between border-b-2 border-black pb-4 mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-black">Rosa Mexicano</h1>
+              <p className="text-gray-600">Relatório {tipoRelatorio === 'diario' ? 'Diário' : 'de Período'}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-semibold text-black">
+                {tipoRelatorio === 'diario'
+                  ? new Date(dataEspecifica + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+                  : `Últimos ${periodo} dias`}
+              </p>
+              <p className="text-sm text-gray-500">Gerado em: {new Date().toLocaleString('pt-BR')}</p>
+            </div>
+          </div>
         </div>
 
         {loading ? (
@@ -172,9 +295,9 @@ export default function AdminReports() {
         ) : data ? (
           <div className="space-y-8">
             {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:grid-cols-4">
               {/* Faturamento */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-green-900/30 rounded-lg">
                     <DollarSign className="w-6 h-6 text-green-400" />
@@ -186,13 +309,13 @@ export default function AdminReports() {
                     </div>
                   )}
                 </div>
-                <p className="text-zinc-400 text-sm">Faturamento Total</p>
-                <p className="text-2xl font-bold text-green-400">{formatCurrency(data.faturamento.total)}</p>
-                <p className="text-xs text-zinc-500 mt-1">Ticket médio: {formatCurrency(data.faturamento.ticketMedio)}</p>
+                <p className="text-zinc-400 text-sm print:text-gray-600">Faturamento Total</p>
+                <p className="text-2xl font-bold text-green-400 print:text-green-600">{formatCurrency(data.faturamento.total)}</p>
+                <p className="text-xs text-zinc-500 mt-1 print:text-gray-500">Ticket médio: {formatCurrency(data.faturamento.ticketMedio)}</p>
               </div>
 
               {/* Reservas */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-blue-900/30 rounded-lg">
                     <Calendar className="w-6 h-6 text-blue-400" />
@@ -204,77 +327,77 @@ export default function AdminReports() {
                     </div>
                   )}
                 </div>
-                <p className="text-zinc-400 text-sm">Total de Reservas</p>
-                <p className="text-2xl font-bold text-blue-400">{data.reservas.total}</p>
-                <p className="text-xs text-zinc-500 mt-1">{data.reservas.totalPessoas} pessoas (média: {data.reservas.mediaPessoas})</p>
+                <p className="text-zinc-400 text-sm print:text-gray-600">Total de Reservas</p>
+                <p className="text-2xl font-bold text-blue-400 print:text-blue-600">{data.reservas.total}</p>
+                <p className="text-xs text-zinc-500 mt-1 print:text-gray-500">{data.reservas.totalPessoas} pessoas (média: {data.reservas.mediaPessoas})</p>
               </div>
 
               {/* Vouchers */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-purple-900/30 rounded-lg">
                     <Ticket className="w-6 h-6 text-purple-400" />
                   </div>
                   <span className="text-sm text-purple-400">{data.vouchers.taxaUtilizacao}% usado</span>
                 </div>
-                <p className="text-zinc-400 text-sm">Vouchers Emitidos</p>
-                <p className="text-2xl font-bold text-purple-400">{data.vouchers.total}</p>
-                <p className="text-xs text-zinc-500 mt-1">{data.vouchers.utilizados} utilizados</p>
+                <p className="text-zinc-400 text-sm print:text-gray-600">Vouchers Emitidos</p>
+                <p className="text-2xl font-bold text-purple-400 print:text-purple-600">{data.vouchers.total}</p>
+                <p className="text-xs text-zinc-500 mt-1 print:text-gray-500">{data.vouchers.utilizados} utilizados</p>
               </div>
 
               {/* Taxa de Conversão */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-yellow-900/30 rounded-lg">
                     <CheckCircle className="w-6 h-6 text-yellow-400" />
                   </div>
                 </div>
-                <p className="text-zinc-400 text-sm">Taxa de Aprovação</p>
-                <p className="text-2xl font-bold text-yellow-400">
+                <p className="text-zinc-400 text-sm print:text-gray-600">Taxa de Aprovação</p>
+                <p className="text-2xl font-bold text-yellow-400 print:text-yellow-600">
                   {data.reservas.total > 0
                     ? (((data.reservas.confirmadas + data.reservas.aprovadas) / data.reservas.total) * 100).toFixed(1)
                     : '0'}%
                 </p>
-                <p className="text-xs text-zinc-500 mt-1">{data.reservas.confirmadas + data.reservas.aprovadas} confirmadas/aprovadas</p>
+                <p className="text-xs text-zinc-500 mt-1 print:text-gray-500">{data.reservas.confirmadas + data.reservas.aprovadas} confirmadas/aprovadas</p>
               </div>
             </div>
 
             {/* Status das Reservas */}
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-              <h2 className="text-xl font-semibold mb-6">Status das Reservas</h2>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="text-center p-4 bg-yellow-900/20 rounded-lg">
-                  <AlertCircle className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-yellow-400">{data.reservas.pendentes}</p>
-                  <p className="text-sm text-zinc-400">Pendentes</p>
+            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+              <h2 className="text-xl font-semibold mb-6 print:text-black">Status das Reservas</h2>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 print:grid-cols-5">
+                <div className="text-center p-4 bg-yellow-900/20 rounded-lg print:bg-yellow-50 print:border print:border-yellow-200">
+                  <AlertCircle className="w-8 h-8 text-yellow-400 mx-auto mb-2 print:text-yellow-600" />
+                  <p className="text-2xl font-bold text-yellow-400 print:text-yellow-600">{data.reservas.pendentes}</p>
+                  <p className="text-sm text-zinc-400 print:text-gray-600">Pendentes</p>
                 </div>
-                <div className="text-center p-4 bg-blue-900/20 rounded-lg">
-                  <CheckCircle className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-blue-400">{data.reservas.confirmadas}</p>
-                  <p className="text-sm text-zinc-400">Confirmadas</p>
+                <div className="text-center p-4 bg-blue-900/20 rounded-lg print:bg-blue-50 print:border print:border-blue-200">
+                  <CheckCircle className="w-8 h-8 text-blue-400 mx-auto mb-2 print:text-blue-600" />
+                  <p className="text-2xl font-bold text-blue-400 print:text-blue-600">{data.reservas.confirmadas}</p>
+                  <p className="text-sm text-zinc-400 print:text-gray-600">Confirmadas</p>
                 </div>
-                <div className="text-center p-4 bg-green-900/20 rounded-lg">
-                  <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-green-400">{data.reservas.aprovadas}</p>
-                  <p className="text-sm text-zinc-400">Aprovadas</p>
+                <div className="text-center p-4 bg-green-900/20 rounded-lg print:bg-green-50 print:border print:border-green-200">
+                  <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2 print:text-green-600" />
+                  <p className="text-2xl font-bold text-green-400 print:text-green-600">{data.reservas.aprovadas}</p>
+                  <p className="text-sm text-zinc-400 print:text-gray-600">Aprovadas</p>
                 </div>
-                <div className="text-center p-4 bg-red-900/20 rounded-lg">
-                  <XCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-red-400">{data.reservas.rejeitadas}</p>
-                  <p className="text-sm text-zinc-400">Rejeitadas</p>
+                <div className="text-center p-4 bg-red-900/20 rounded-lg print:bg-red-50 print:border print:border-red-200">
+                  <XCircle className="w-8 h-8 text-red-400 mx-auto mb-2 print:text-red-600" />
+                  <p className="text-2xl font-bold text-red-400 print:text-red-600">{data.reservas.rejeitadas}</p>
+                  <p className="text-sm text-zinc-400 print:text-gray-600">Rejeitadas</p>
                 </div>
-                <div className="text-center p-4 bg-zinc-800 rounded-lg">
-                  <XCircle className="w-8 h-8 text-zinc-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-zinc-400">{data.reservas.canceladas}</p>
-                  <p className="text-sm text-zinc-400">Canceladas</p>
+                <div className="text-center p-4 bg-zinc-800 rounded-lg print:bg-gray-100 print:border print:border-gray-200">
+                  <XCircle className="w-8 h-8 text-zinc-400 mx-auto mb-2 print:text-gray-600" />
+                  <p className="text-2xl font-bold text-zinc-400 print:text-gray-600">{data.reservas.canceladas}</p>
+                  <p className="text-sm text-zinc-400 print:text-gray-600">Canceladas</p>
                 </div>
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-6 print:grid-cols-2">
               {/* Faturamento por Dia */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-                <h2 className="text-xl font-semibold mb-6">Faturamento por Dia</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+                <h2 className="text-xl font-semibold mb-6 print:text-black">Faturamento por Dia</h2>
                 {Object.keys(data.faturamento.porDia).length > 0 ? (
                   <div className="space-y-3">
                     {Object.entries(data.faturamento.porDia)
@@ -301,8 +424,8 @@ export default function AdminReports() {
               </div>
 
               {/* Horários Mais Procurados */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-                <h2 className="text-xl font-semibold mb-6">Horários Mais Procurados</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+                <h2 className="text-xl font-semibold mb-6 print:text-black">Horários Mais Procurados</h2>
                 {data.reservas.horariosMaisProcurados.length > 0 ? (
                   <div className="space-y-3">
                     {data.reservas.horariosMaisProcurados.map(([horario, quantidade], index) => (
@@ -330,8 +453,8 @@ export default function AdminReports() {
             </div>
 
             {/* Vouchers */}
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-              <h2 className="text-xl font-semibold mb-6">Vouchers</h2>
+            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+              <h2 className="text-xl font-semibold mb-6 print:text-black">Vouchers</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <p className="text-sm text-zinc-400 mb-2">Distribuição</p>
@@ -381,33 +504,128 @@ export default function AdminReports() {
               </div>
             </div>
 
-            {/* Reservas por Dia */}
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
-              <h2 className="text-xl font-semibold mb-6">Reservas por Dia</h2>
-              {Object.keys(data.reservas.porDia).length > 0 ? (
-                <div className="space-y-3">
-                  {Object.entries(data.reservas.porDia)
-                    .sort((a, b) => a[0].localeCompare(b[0]))
-                    .slice(-14)
-                    .map(([date, value]) => (
-                      <div key={date} className="flex items-center gap-3">
-                        <span className="text-sm text-zinc-400 w-16">{formatDate(date)}</span>
-                        <div className="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
-                          <div
-                            className="h-full bg-blue-600 rounded"
-                            style={{
-                              width: `${(value / getMaxValue(data.reservas.porDia)) * 100}%`,
-                            }}
-                          />
+            {/* Reservas por Dia - Apenas para relatório de período */}
+            {!data.dataEspecifica && (
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+                <h2 className="text-xl font-semibold mb-6 print:text-black">Reservas por Dia</h2>
+                {Object.keys(data.reservas.porDia).length > 0 ? (
+                  <div className="space-y-3">
+                    {Object.entries(data.reservas.porDia)
+                      .sort((a, b) => a[0].localeCompare(b[0]))
+                      .slice(-14)
+                      .map(([date, value]) => (
+                        <div key={date} className="flex items-center gap-3">
+                          <span className="text-sm text-zinc-400 w-16 print:text-gray-600">{formatDate(date)}</span>
+                          <div className="flex-1 h-6 bg-zinc-800 rounded overflow-hidden print:bg-gray-200">
+                            <div
+                              className="h-full bg-blue-600 rounded print:bg-blue-500"
+                              style={{
+                                width: `${(value / getMaxValue(data.reservas.porDia)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium w-20 text-right print:text-black">{value} reservas</span>
                         </div>
-                        <span className="text-sm font-medium w-20 text-right">{value} reservas</span>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-zinc-500 text-center py-8">Nenhum dado no período</p>
+                )}
+              </div>
+            )}
+
+            {/* Lista Detalhada de Reservas - Apenas para relatório diário */}
+            {data.listaReservas && data.listaReservas.length > 0 && (
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+                <h2 className="text-xl font-semibold mb-6 print:text-black">Lista de Reservas</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-zinc-800 print:bg-gray-100">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Horário</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Cliente</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Contato</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Pessoas</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Mesa</th>
+                        <th className="px-3 py-2 text-right text-zinc-400 print:text-gray-600">Valor</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Status</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Voucher</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800 print:divide-gray-200">
+                      {data.listaReservas
+                        .sort((a, b) => a.horario.localeCompare(b.horario))
+                        .map((reserva) => (
+                          <tr key={reserva.id} className="print:text-black">
+                            <td className="px-3 py-2 font-medium">{reserva.horario}</td>
+                            <td className="px-3 py-2">{reserva.nome}</td>
+                            <td className="px-3 py-2">
+                              <div className="text-xs">
+                                <p>{reserva.telefone}</p>
+                                <p className="text-zinc-500 print:text-gray-500">{reserva.email}</p>
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 text-center">{reserva.numeroPessoas}</td>
+                            <td className="px-3 py-2">
+                              {reserva.mesasSelecionadas
+                                ? JSON.parse(reserva.mesasSelecionadas).join(', ')
+                                : '-'}
+                            </td>
+                            <td className="px-3 py-2 text-right font-medium">{formatCurrency(reserva.valor)}</td>
+                            <td className={`px-3 py-2 text-center font-medium ${getStatusColor(reserva.status)} print:text-black`}>
+                              {getStatusLabel(reserva.status)}
+                            </td>
+                            <td className="px-3 py-2 text-center">
+                              {reserva.voucher ? (
+                                <span className={`text-xs font-mono ${reserva.voucher.utilizado ? 'text-yellow-400 print:text-yellow-600' : 'text-green-400 print:text-green-600'}`}>
+                                  {reserva.voucher.codigo}
+                                </span>
+                              ) : '-'}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
-              ) : (
-                <p className="text-zinc-500 text-center py-8">Nenhum dado no período</p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Lista Detalhada de Vouchers - Apenas para relatório diário */}
+            {data.listaVouchers && data.listaVouchers.length > 0 && (
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
+                <h2 className="text-xl font-semibold mb-6 print:text-black">Lista de Vouchers</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-zinc-800 print:bg-gray-100">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Código</th>
+                        <th className="px-3 py-2 text-left text-zinc-400 print:text-gray-600">Cliente</th>
+                        <th className="px-3 py-2 text-right text-zinc-400 print:text-gray-600">Valor</th>
+                        <th className="px-3 py-2 text-center text-zinc-400 print:text-gray-600">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800 print:divide-gray-200">
+                      {data.listaVouchers.map((voucher) => (
+                        <tr key={voucher.codigo} className="print:text-black">
+                          <td className="px-3 py-2 font-mono font-medium">{voucher.codigo}</td>
+                          <td className="px-3 py-2">{voucher.cliente}</td>
+                          <td className="px-3 py-2 text-right font-medium text-[#E53935] print:text-red-600">
+                            {formatCurrency(voucher.valor)}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            {voucher.utilizado ? (
+                              <span className="text-yellow-400 print:text-yellow-600">Utilizado</span>
+                            ) : (
+                              <span className="text-green-400 print:text-green-600">Disponível</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-zinc-500 text-center py-20">Erro ao carregar relatórios</p>
