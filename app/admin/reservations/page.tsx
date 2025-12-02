@@ -22,6 +22,15 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
+type Voucher = {
+  id: string;
+  codigo: string;
+  valor: number;
+  utilizado: boolean;
+  dataUtilizacao: string | null;
+  dataValidade: string;
+};
+
 type Reservation = {
   id: string;
   externalRef: string;
@@ -35,6 +44,7 @@ type Reservation = {
   valor: number;
   status: string;
   createdAt: string;
+  voucher?: Voucher | null;
 };
 
 export default function AdminReservations() {
@@ -428,6 +438,55 @@ export default function AdminReservations() {
                     </div>
                   </div>
                 </div>
+
+                {/* Voucher */}
+                {selectedReservation.voucher && (
+                  <div className="border-t border-zinc-800 pt-4">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <QrCode className="w-4 h-4 text-[#E53935]" />
+                      Voucher
+                    </h3>
+                    <div className="bg-zinc-800/50 rounded-lg p-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm text-zinc-400">Código</label>
+                          <p className="font-mono font-bold text-lg">{selectedReservation.voucher.codigo}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm text-zinc-400">Status</label>
+                          <p className="font-medium">
+                            {selectedReservation.voucher.utilizado ? (
+                              <span className="inline-flex items-center gap-1 text-yellow-400">
+                                <CheckCircle className="w-4 h-4" />
+                                Utilizado
+                                {selectedReservation.voucher.dataUtilizacao && (
+                                  <span className="text-xs text-zinc-500 ml-1">
+                                    ({new Date(selectedReservation.voucher.dataUtilizacao).toLocaleDateString('pt-BR')})
+                                  </span>
+                                )}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-green-400">
+                                <Clock className="w-4 h-4" />
+                                Disponível
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-sm text-zinc-400">Valor</label>
+                          <p className="font-medium text-[#E53935]">R$ {selectedReservation.voucher.valor.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm text-zinc-400">Validade</label>
+                          <p className="font-medium">
+                            {new Date(selectedReservation.voucher.dataValidade).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 flex gap-3">

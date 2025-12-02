@@ -22,7 +22,8 @@ import {
   Mail,
   Loader2,
   Eye,
-  X
+  X,
+  Table as TableIcon
 } from 'lucide-react';
 
 type VoucherData = {
@@ -41,6 +42,7 @@ type VoucherData = {
     data: string;
     horario: string;
     numeroPessoas: number;
+    mesasSelecionadas: string | null;
     status: string;
   };
 };
@@ -261,6 +263,7 @@ export default function VouchersPage() {
                     <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Cliente</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Contato</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Reserva</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Mesa</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Valor</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-zinc-400">Status</th>
                     <th className="px-4 py-3 text-center text-sm font-medium text-zinc-400">Ações</th>
@@ -284,6 +287,13 @@ export default function VouchersPage() {
                       <td className="px-4 py-3">
                         <p className="text-sm">{voucher.reservation?.data ? formatDate(voucher.reservation.data) : '-'}</p>
                         <p className="text-sm text-zinc-500">{voucher.reservation?.horario || '-'}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm">
+                          {voucher.reservation?.mesasSelecionadas
+                            ? JSON.parse(voucher.reservation.mesasSelecionadas).join(', ')
+                            : '-'}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-[#E53935] font-semibold">R$ {voucher.valor?.toFixed(2)}</span>
@@ -420,6 +430,18 @@ export default function VouchersPage() {
                   <div>
                     <p className="text-sm text-zinc-400">Pessoas</p>
                     <p className="font-medium">{selectedVoucher.reservation?.numeroPessoas || '-'} pessoas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <TableIcon className="w-5 h-5 text-zinc-500" />
+                  <div>
+                    <p className="text-sm text-zinc-400">Mesa(s)</p>
+                    <p className="font-medium">
+                      {selectedVoucher.reservation?.mesasSelecionadas
+                        ? JSON.parse(selectedVoucher.reservation.mesasSelecionadas).join(', ')
+                        : '-'}
+                    </p>
                   </div>
                 </div>
               </div>

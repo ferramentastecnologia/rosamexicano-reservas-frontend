@@ -15,6 +15,7 @@ export async function GET() {
             data: true,
             horario: true,
             numeroPessoas: true,
+            mesasSelecionadas: true,
             status: true,
           }
         }
