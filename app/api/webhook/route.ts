@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { generateVoucherCode, generateQRCodeData, getExpiryDate } from '@/lib/voucher-helpers';
-import { sendVoucherEmail } from '@/lib/email-sender';
-import { generateVoucherPDF } from '@/lib/pdf-generator';
 
 export async function POST(request: Request) {
   try {
@@ -25,76 +22,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ received: true });
       }
 
-      // Verificar se já existe voucher
-      const existingVoucher = await prisma.voucher.findUnique({
-        where: { reservationId: reservation.id },
-      });
-
-      if (existingVoucher) {
-        console.log('Voucher já existe para esta reserva');
-        return NextResponse.json({ received: true, voucher: existingVoucher.codigo });
-      }
-
-      // 1. Gerar código do voucher
-      const voucherCode = generateVoucherCode();
-      console.log('Código gerado:', voucherCode);
-
-      // 2. Gerar dados do QR Code
-      const qrCodeData = await generateQRCodeData(voucherCode, reservation);
-
-      // 3. Criar voucher no banco de dados
-      const voucher = await prisma.voucher.create({
-        data: {
-          reservationId: reservation.id,
-          codigo: voucherCode,
-          valor: 50.00,
-          qrCodeData: qrCodeData,
-          dataValidade: getExpiryDate(),
-        },
-        include: {
-          reservation: true,
-        },
-      });
-
-      console.log('Voucher criado:', voucher.id);
-
-      // 4. Atualizar status da reserva
+      // Atualizar status da reserva para "confirmed" (aguardando aprovação do estabelecimento)
       await prisma.reservation.update({
         where: { id: reservation.id },
         data: { status: 'confirmed' },
       });
 
-      console.log('Reserva confirmada com sucesso!');
+      console.log('Pagamento confirmado! Reserva aguardando aprovação do estabelecimento.');
 
-      // Retorna sucesso ANTES de enviar email (não bloqueia o webhook)
-      const response = NextResponse.json({
+      return NextResponse.json({
         received: true,
-        voucherCode: voucher.codigo,
         reservationId: reservation.id,
+        message: 'Pagamento confirmado, aguardando aprovação'
       });
-
-      // Tenta enviar email em background (não bloqueia nem quebra se falhar)
-      try {
-        const pdfBuffer = await generateVoucherPDF(voucher);
-        console.log('PDF gerado, tamanho:', pdfBuffer.length);
-
-        const emailSent = await sendVoucherEmail(
-          reservation.email,
-          voucher,
-          pdfBuffer
-        );
-
-        if (emailSent) {
-          console.log('Email enviado com sucesso para:', reservation.email);
-        } else {
-          console.log('Email não enviado (configuração pendente)');
-        }
-      } catch (emailError) {
-        console.error('Erro ao enviar email (não crítico):', emailError);
-        // Não falha o webhook por causa do email
-      }
-
-      return response;
     }
 
     // Outros eventos
