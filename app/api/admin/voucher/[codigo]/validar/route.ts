@@ -43,14 +43,13 @@ export async function POST(
         );
       }
 
-      // Se é o mesmo dia, verificar horário (com margem de 3h)
+      // Se é o mesmo dia, verificar se já passou do horário da reserva
       if (reservationDateStr === todayStr) {
         const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
         const reservationTime = hours * 60 + minutes;
         const currentTime = today.getHours() * 60 + today.getMinutes();
-        const marginMinutes = 3 * 60;
 
-        if (currentTime > reservationTime + marginMinutes) {
+        if (currentTime > reservationTime) {
           return NextResponse.json(
             { error: 'Voucher expirado - horário da reserva já passou' },
             { status: 400 }
