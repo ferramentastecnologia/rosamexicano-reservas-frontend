@@ -1,0 +1,174 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const periodo = searchParams.get('periodo') || '30'; // dias
+
+    const diasAtras = parseInt(periodo);
+    const dataInicio = new Date();
+    dataInicio.setDate(dataInicio.getDate() - diasAtras);
+    const dataInicioStr = dataInicio.toISOString().split('T')[0];
+
+    // Buscar todas as reservas do período
+    const reservas = await prisma.reservation.findMany({
+      where: {
+        data: {
+          gte: dataInicioStr,
+        },
+      },
+      include: {
+        voucher: true,
+      },
+      orderBy: {
+        data: 'asc',
+      },
+    });
+
+    // Buscar todos os vouchers do período
+    const vouchers = await prisma.voucher.findMany({
+      where: {
+        createdAt: {
+          gte: dataInicio,
+        },
+      },
+    });
+
+    // === FATURAMENTO ===
+    const reservasConfirmadas = reservas.filter(r =>
+      r.status === 'confirmed' || r.status === 'approved'
+    );
+
+    const faturamentoTotal = reservasConfirmadas.reduce((acc, r) => acc + r.valor, 0);
+
+    // Faturamento por dia
+    const faturamentoPorDia: { [key: string]: number } = {};
+    reservasConfirmadas.forEach(r => {
+      if (!faturamentoPorDia[r.data]) {
+        faturamentoPorDia[r.data] = 0;
+      }
+      faturamentoPorDia[r.data] += r.valor;
+    });
+
+    // === RESERVAS ===
+    const totalReservas = reservas.length;
+    const reservasPendentes = reservas.filter(r => r.status === 'pending').length;
+    const reservasConfirmadasCount = reservas.filter(r => r.status === 'confirmed').length;
+    const reservasAprovadas = reservas.filter(r => r.status === 'approved').length;
+    const reservasRejeitadas = reservas.filter(r => r.status === 'rejected').length;
+    const reservasCanceladas = reservas.filter(r => r.status === 'cancelled').length;
+
+    // Reservas por dia
+    const reservasPorDia: { [key: string]: number } = {};
+    reservas.forEach(r => {
+      if (!reservasPorDia[r.data]) {
+        reservasPorDia[r.data] = 0;
+      }
+      reservasPorDia[r.data]++;
+    });
+
+    // Horários mais procurados
+    const horariosProcurados: { [key: string]: number } = {};
+    reservas.forEach(r => {
+      if (!horariosProcurados[r.horario]) {
+        horariosProcurados[r.horario] = 0;
+      }
+      horariosProcurados[r.horario]++;
+    });
+
+    // Ordenar horários por quantidade
+    const horariosOrdenados = Object.entries(horariosProcurados)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    // Total de pessoas
+    const totalPessoas = reservasConfirmadas.reduce((acc, r) => acc + r.numeroPessoas, 0);
+    const mediaPessoas = reservasConfirmadas.length > 0
+      ? (totalPessoas / reservasConfirmadas.length).toFixed(1)
+      : '0';
+
+    // === VOUCHERS ===
+    const totalVouchers = vouchers.length;
+    const vouchersUtilizados = vouchers.filter(v => v.utilizado).length;
+    const vouchersNaoUtilizados = vouchers.filter(v => !v.utilizado).length;
+    const vouchersExpirados = vouchers.filter(v =>
+      !v.utilizado && new Date(v.dataValidade) < new Date()
+    ).length;
+
+    // Valor total em vouchers
+    const valorTotalVouchers = vouchers.reduce((acc, v) => acc + v.valor, 0);
+    const valorVouchersUtilizados = vouchers
+      .filter(v => v.utilizado)
+      .reduce((acc, v) => acc + v.valor, 0);
+
+    // === TENDÊNCIAS ===
+    // Comparar com período anterior
+    const dataAnteriorInicio = new Date(dataInicio);
+    dataAnteriorInicio.setDate(dataAnteriorInicio.getDate() - diasAtras);
+    const dataAnteriorInicioStr = dataAnteriorInicio.toISOString().split('T')[0];
+
+    const reservasAnteriores = await prisma.reservation.findMany({
+      where: {
+        data: {
+          gte: dataAnteriorInicioStr,
+          lt: dataInicioStr,
+        },
+        status: {
+          in: ['confirmed', 'approved'],
+        },
+      },
+    });
+
+    const faturamentoAnterior = reservasAnteriores.reduce((acc, r) => acc + r.valor, 0);
+    const crescimentoFaturamento = faturamentoAnterior > 0
+      ? (((faturamentoTotal - faturamentoAnterior) / faturamentoAnterior) * 100).toFixed(1)
+      : '0';
+
+    const crescimentoReservas = reservasAnteriores.length > 0
+      ? (((reservasConfirmadas.length - reservasAnteriores.length) / reservasAnteriores.length) * 100).toFixed(1)
+      : '0';
+
+    return NextResponse.json({
+      periodo: diasAtras,
+      faturamento: {
+        total: faturamentoTotal,
+        porDia: faturamentoPorDia,
+        crescimento: parseFloat(crescimentoFaturamento),
+        ticketMedio: reservasConfirmadas.length > 0
+          ? faturamentoTotal / reservasConfirmadas.length
+          : 0,
+      },
+      reservas: {
+        total: totalReservas,
+        pendentes: reservasPendentes,
+        confirmadas: reservasConfirmadasCount,
+        aprovadas: reservasAprovadas,
+        rejeitadas: reservasRejeitadas,
+        canceladas: reservasCanceladas,
+        porDia: reservasPorDia,
+        crescimento: parseFloat(crescimentoReservas),
+        horariosMaisProcurados: horariosOrdenados,
+        totalPessoas,
+        mediaPessoas: parseFloat(mediaPessoas),
+      },
+      vouchers: {
+        total: totalVouchers,
+        utilizados: vouchersUtilizados,
+        naoUtilizados: vouchersNaoUtilizados,
+        expirados: vouchersExpirados,
+        valorTotal: valorTotalVouchers,
+        valorUtilizado: valorVouchersUtilizados,
+        taxaUtilizacao: totalVouchers > 0
+          ? ((vouchersUtilizados / totalVouchers) * 100).toFixed(1)
+          : '0',
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatórios:', error);
+    return NextResponse.json(
+      { error: 'Erro ao gerar relatórios' },
+      { status: 500 }
+    );
+  }
+}
