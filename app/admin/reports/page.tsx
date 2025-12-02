@@ -294,8 +294,8 @@ export default function AdminReports() {
           </div>
         ) : data ? (
           <div className="space-y-8">
-            {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:grid-cols-4">
+            {/* Cards de Resumo - Oculto na impressão */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
               {/* Faturamento */}
               <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
                 <div className="flex items-center justify-between mb-4">
@@ -362,10 +362,10 @@ export default function AdminReports() {
               </div>
             </div>
 
-            {/* Status das Reservas */}
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-              <h2 className="text-xl font-semibold mb-6 print:text-black">Status das Reservas</h2>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 print:grid-cols-5">
+            {/* Status das Reservas - Oculto na impressão */}
+            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:hidden">
+              <h2 className="text-xl font-semibold mb-6">Status das Reservas</h2>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="text-center p-4 bg-yellow-900/20 rounded-lg print:bg-yellow-50 print:border print:border-yellow-200">
                   <AlertCircle className="w-8 h-8 text-yellow-400 mx-auto mb-2 print:text-yellow-600" />
                   <p className="text-2xl font-bold text-yellow-400 print:text-yellow-600">{data.reservas.pendentes}</p>
@@ -394,10 +394,10 @@ export default function AdminReports() {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6 print:grid-cols-2">
+            <div className="grid lg:grid-cols-2 gap-6 print:hidden">
               {/* Faturamento por Dia */}
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-                <h2 className="text-xl font-semibold mb-6 print:text-black">Faturamento por Dia</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
+                <h2 className="text-xl font-semibold mb-6">Faturamento por Dia</h2>
                 {Object.keys(data.faturamento.porDia).length > 0 ? (
                   <div className="space-y-3">
                     {Object.entries(data.faturamento.porDia)
@@ -452,9 +452,9 @@ export default function AdminReports() {
               </div>
             </div>
 
-            {/* Vouchers */}
-            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-              <h2 className="text-xl font-semibold mb-6 print:text-black">Vouchers</h2>
+            {/* Vouchers - Oculto na impressão */}
+            <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:hidden">
+              <h2 className="text-xl font-semibold mb-6">Vouchers</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <p className="text-sm text-zinc-400 mb-2">Distribuição</p>
@@ -504,10 +504,10 @@ export default function AdminReports() {
               </div>
             </div>
 
-            {/* Reservas por Dia - Apenas para relatório de período */}
+            {/* Reservas por Dia - Oculto na impressão */}
             {!data.dataEspecifica && (
-              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:bg-white print:border-gray-300">
-                <h2 className="text-xl font-semibold mb-6 print:text-black">Reservas por Dia</h2>
+              <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 print:hidden">
+                <h2 className="text-xl font-semibold mb-6">Reservas por Dia</h2>
                 {Object.keys(data.reservas.porDia).length > 0 ? (
                   <div className="space-y-3">
                     {Object.entries(data.reservas.porDia)
