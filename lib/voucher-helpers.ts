@@ -12,7 +12,7 @@ export function generateVoucherCode(): string {
 
   const timestamp = Date.now().toString(36).toUpperCase().padStart(8, '0');
 
-  return `MOR-${randomPart}-${timestamp}`;
+  return `RM-${randomPart}-${timestamp}`;
 }
 
 /**
@@ -21,7 +21,7 @@ export function generateVoucherCode(): string {
 export async function generateQRCodeData(voucherCode: string, reservationData: any): Promise<string> {
   const qrData = {
     codigo: voucherCode,
-    restaurante: 'Mortadella Ristorante',
+    restaurante: 'Rosa Mexicano',
     valor: 5.00,
     data: reservationData.data,
     horario: reservationData.horario,

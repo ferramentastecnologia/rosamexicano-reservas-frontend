@@ -13,14 +13,14 @@ export async function generateVoucherPDF(voucherData: any): Promise<Buffer> {
         resolve(pdfBuffer);
       });
 
-      // Header com gradiente verde
-      doc.rect(0, 0, 595, 150).fill('#0e9a20');
+      // Header com gradiente vermelho
+      doc.rect(0, 0, 595, 150).fill('#E53935');
 
       // Logo e título
       doc.fillColor('#FFFFFF')
          .fontSize(32)
          .font('Helvetica-Bold')
-         .text('MORTADELLA RISTORANTE', 50, 40, { align: 'center' });
+         .text('ROSA MEXICANO', 50, 40, { align: 'center' });
 
       doc.fontSize(16)
          .font('Helvetica')
@@ -33,7 +33,7 @@ export async function generateVoucherPDF(voucherData: any): Promise<Buffer> {
          .text('CÓDIGO DO VOUCHER', 50, 180);
 
       doc.fontSize(32)
-         .fillColor('#0e9a20')
+         .fillColor('#E53935')
          .font('Courier-Bold')
          .text(voucherData.codigo, 50, 215);
 
@@ -78,7 +78,7 @@ export async function generateVoucherPDF(voucherData: any): Promise<Buffer> {
       // Informações importantes
       doc.moveTo(50, yPos + 10).lineTo(545, yPos + 10).stroke();
 
-      doc.fillColor('#0e9a20')
+      doc.fillColor('#E53935')
          .fontSize(16)
          .font('Helvetica-Bold')
          .text('IMPORTANTE', 50, yPos + 30);
@@ -91,7 +91,7 @@ export async function generateVoucherPDF(voucherData: any): Promise<Buffer> {
         '• Este voucher é 100% conversível em consumação',
         '• Apresente este código na chegada ao restaurante',
         `• Válido até: ${new Date(voucherData.dataValidade).toLocaleDateString('pt-BR')}`,
-        '• Em caso de dúvidas, entre em contato: (47) 3037-6060',
+        '• Em caso de dúvidas, entre em contato: (47) 3288-3096',
       ];
 
       yPos += 60;
@@ -104,7 +104,7 @@ export async function generateVoucherPDF(voucherData: any): Promise<Buffer> {
       doc.fontSize(9)
          .fillColor('#999999')
          .text(
-           'Av. Martin Luther, 1001 - Victor Konder, Blumenau/SC | Tel: (47) 3037-6060',
+           'Rua Carlos Rischbieter, 64 - Victor Konder, Blumenau/SC | Tel: (47) 3288-3096',
            50,
            750,
            { align: 'center' }

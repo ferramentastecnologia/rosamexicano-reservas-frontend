@@ -54,10 +54,7 @@ export async function PATCH(
         }
       }
 
-      // Enviar email de aprovação
-      sendApprovalEmail(reservation).catch(err =>
-        console.error('Erro ao enviar email de aprovação:', err)
-      );
+      // Não enviar email de aprovação separado - o voucher já é o email principal
     } else if (status === 'rejected') {
       sendRejectionEmail(reservation).catch(err =>
         console.error('Erro ao enviar email de rejeição:', err)
