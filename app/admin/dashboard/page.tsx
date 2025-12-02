@@ -14,7 +14,8 @@ import {
   LayoutDashboard,
   List,
   BarChart3,
-  QrCode
+  QrCode,
+  Table as TableIcon
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
