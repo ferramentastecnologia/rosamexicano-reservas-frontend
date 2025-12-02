@@ -195,18 +195,10 @@ export default function SucessoContent() {
             </p>
             <div className="flex flex-wrap gap-4">
               <a
-                href="https://wa.me/554799998888"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="tel:+554732883096"
                 className="inline-flex items-center gap-2 bg-[#E53935] hover:bg-[#B71C1C] text-white px-4 py-2 rounded-lg transition text-sm font-medium"
               >
-                WhatsApp: (47) 99999-8888
-              </a>
-              <a
-                href="tel:+554733334444"
-                className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium"
-              >
-                Telefone: (47) 3333-4444
+                Telefone: (47) 3288-3096
               </a>
             </div>
           </div>

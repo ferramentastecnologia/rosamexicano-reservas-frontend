@@ -275,16 +275,14 @@ export default function Home() {
 
                 <h4 className="text-xl font-semibold text-[#E53935] mt-6">Contato</h4>
                 <p className="text-zinc-300">
-                  <strong>Telefone:</strong> (47) 3333-4444<br />
-                  <strong>WhatsApp:</strong> (47) 99999-8888
+                  <strong>Telefone:</strong> (47) 3288-3096
                 </p>
 
                 <a
-                  href="https://wa.me/554799998888"
-                  target="_blank"
+                  href="tel:+554732883096"
                   className="inline-flex items-center gap-2 bg-[#E53935] hover:bg-[#B71C1C] text-white px-6 py-3 rounded-lg transition mt-4"
                 >
-                  Fale no WhatsApp
+                  Ligar Agora
                 </a>
               </div>
 
@@ -347,7 +345,7 @@ export default function Home() {
             <p className="mb-2 text-white">© 2025 Rosa Mexicano Restaurante</p>
             <p className="text-sm">Sabor Autêntico Mexicano</p>
             <p className="text-xs mt-4">Rua Carlos Rischbieter, 64 - Victor Konder, Blumenau/SC</p>
-            <p className="text-xs mt-2">(47) 3333-4444 | WhatsApp: (47) 99999-8888</p>
+            <p className="text-xs mt-2">(47) 3288-3096</p>
           </div>
         </div>
       </footer>

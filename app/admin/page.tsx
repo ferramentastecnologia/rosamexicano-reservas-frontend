@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 import Image from 'next/image';
 
 export default function AdminLoginPage() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,17 +21,17 @@ export default function AdminLoginPage() {
       const response = await fetch('/api/admin/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Salvar token no localStorage
         localStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_user', JSON.stringify(data.user));
         router.push('/admin/dashboard');
       } else {
-        setError('Senha incorreta');
+        setError(data.error || 'Email ou senha incorretos');
       }
     } catch (error) {
       setError('Erro ao fazer login');
@@ -57,10 +58,27 @@ export default function AdminLoginPage() {
           <h1 className="text-2xl font-bold text-center mb-2">Painel Administrativo</h1>
           <p className="text-zinc-400 text-center mb-8">Acesso restrito</p>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Senha de Acesso
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Senha
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
@@ -69,7 +87,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-                  placeholder="Digite a senha"
+                  placeholder="Digite sua senha"
                   required
                 />
               </div>
@@ -81,7 +99,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
+              className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 mt-6"
             >
               {loading ? 'Verificando...' : 'Acessar Painel'}
             </button>
