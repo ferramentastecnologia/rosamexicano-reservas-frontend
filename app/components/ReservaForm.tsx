@@ -443,9 +443,9 @@ export default function ReservaForm() {
           <h4 className="text-xl font-semibold mb-4">Resumo da Reserva</h4>
 
           <div className="bg-black rounded-lg p-6 border border-zinc-700">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-700 mb-4">
-              <span className="text-lg text-zinc-400">Valor da Reserva:</span>
-              <span className="text-3xl font-bold text-[#E53935]">R$ 50,00</span>
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-700 mb-4 gap-2">
+              <span className="text-base text-zinc-400 whitespace-nowrap">Valor da Reserva:</span>
+              <span className="text-2xl font-bold text-[#E53935] whitespace-nowrap">R$ 50,00</span>
             </div>
 
             <div className="bg-zinc-800 rounded-lg p-4 mb-6">
@@ -463,14 +463,14 @@ export default function ReservaForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-bold text-lg py-5 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-bold text-base py-4 px-6 rounded-lg transition flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 'Processando...'
               ) : (
                 <>
-                  <CreditCard className="w-6 h-6" />
-                  Continuar para Pagamento
+                  <CreditCard className="w-5 h-5 flex-shrink-0" />
+                  <span>Continuar para Pagamento</span>
                 </>
               )}
             </button>
