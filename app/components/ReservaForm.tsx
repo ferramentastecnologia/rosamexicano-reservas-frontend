@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Calendar, Users, Clock, User, Mail, Phone, CreditCard } from 'lucide-react';
+import { Calendar, User, CreditCard } from 'lucide-react';
 import CalendarioReserva from './CalendarioReserva';
 import MapaMesas from './MapaMesas';
 
@@ -10,7 +10,7 @@ import MapaMesas from './MapaMesas';
 function validarCPF(cpf: string): boolean {
   cpf = cpf.replace(/\D/g, '');
   if (cpf.length !== 11) return false;
-  if (/^(\d)\1+$/.test(cpf)) return false; // Todos dígitos iguais
+  if (/^(\d)\1+$/.test(cpf)) return false;
 
   let soma = 0;
   for (let i = 0; i < 9; i++) {
@@ -64,7 +64,6 @@ function validarCNPJ(cnpj: string): boolean {
   return true;
 }
 
-// Função para validar CPF ou CNPJ
 function validarCpfCnpj(valor: string): boolean {
   const limpo = valor.replace(/\D/g, '');
   if (limpo.length === 11) return validarCPF(limpo);
@@ -72,17 +71,14 @@ function validarCpfCnpj(valor: string): boolean {
   return false;
 }
 
-// Função para formatar CPF/CNPJ
 function formatarCpfCnpj(valor: string): string {
   const limpo = valor.replace(/\D/g, '');
   if (limpo.length <= 11) {
-    // CPF: 000.000.000-00
     return limpo
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   } else {
-    // CNPJ: 00.000.000/0000-00
     return limpo
       .replace(/(\d{2})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
@@ -101,14 +97,10 @@ type ReservaFormData = {
   numeroPessoas: number;
 };
 
-const horarios = [
-  '18:00', '18:30', '19:00', '19:30'
-];
+const horarios = ['18:00', '18:30', '19:00', '19:30'];
 
 export default function ReservaForm() {
   const [loading, setLoading] = useState(false);
-  const [etapa, setEtapa] = useState<'formulario' | 'pagamento'>('formulario');
-  const [dadosReserva, setDadosReserva] = useState<ReservaFormData | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTables, setSelectedTables] = useState<number[]>([]);
 
@@ -120,7 +112,6 @@ export default function ReservaForm() {
     control,
   } = useForm<ReservaFormData>();
 
-  // Watch para atualizar o mapa de mesas em tempo real
   const watchedData = useWatch({ control, name: 'data' });
   const watchedHorario = useWatch({ control, name: 'horario' });
   const watchedNumeroPessoas = useWatch({ control, name: 'numeroPessoas' });
@@ -135,7 +126,6 @@ export default function ReservaForm() {
   };
 
   const onSubmit = async (data: ReservaFormData) => {
-    // Validar seleção de mesas
     const mesasNecessarias = Math.ceil(data.numeroPessoas / 4);
     if (selectedTables.length !== mesasNecessarias) {
       alert(`Por favor, selecione exatamente ${mesasNecessarias} mesa(s) para ${data.numeroPessoas} pessoas.`);
@@ -143,10 +133,8 @@ export default function ReservaForm() {
     }
 
     setLoading(true);
-    setDadosReserva(data);
 
     try {
-      // Primeiro, verificar disponibilidade
       const availabilityResponse = await fetch('/api/check-availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -161,7 +149,7 @@ export default function ReservaForm() {
 
       if (!availabilityData.available) {
         alert(
-          `❌ Infelizmente não temos disponibilidade para ${data.numeroPessoas} pessoas neste horário.\n\n` +
+          `Infelizmente não temos disponibilidade para ${data.numeroPessoas} pessoas neste horário.\n\n` +
           `Capacidade disponível: ${availabilityData.capacity?.available || 0} pessoas\n\n` +
           `Por favor, escolha outro horário ou reduza o número de pessoas.`
         );
@@ -169,7 +157,6 @@ export default function ReservaForm() {
         return;
       }
 
-      // Se houver disponibilidade, prosseguir com o pagamento
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -190,7 +177,6 @@ export default function ReservaForm() {
       const result = await response.json();
 
       if (result.success && result.pixQrCode) {
-        // Redirecionar para nossa página de pagamento transparente
         const paymentData = encodeURIComponent(JSON.stringify(result));
         window.location.href = `/pagamento?data=${paymentData}`;
       } else {
@@ -204,208 +190,181 @@ export default function ReservaForm() {
     }
   };
 
+  const inputClasses = "w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-[#f98f21] text-white placeholder:text-white/30 transition-colors";
+  const labelClasses = "block text-sm font-light text-white/70 mb-2";
+  const errorClasses = "text-[#d71919] text-xs mt-1";
+
   return (
-    <div className="bg-zinc-900 rounded-lg p-8 border border-zinc-800">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+    <div className="glass-strong rounded-2xl p-6 md:p-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
           {/* Coluna 1: Dados Pessoais */}
-          <div className="space-y-6 order-1">
-            <div className="space-y-4">
-              <h4 className="text-xl font-semibold flex items-center gap-2">
-                <User className="w-5 h-5 text-[#E53935]" />
-                Seus Dados
-              </h4>
+          <div className="space-y-5 order-1">
+            <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
+              <User className="w-4 h-4 text-[#f98f21]" />
+              Seus Dados
+            </h4>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Nome Completo *</label>
-                <input
-                  {...register('nome', { required: 'Nome é obrigatório' })}
-                  type="text"
-                  className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-                  placeholder="Seu nome completo"
-                />
-                {errors.nome && (
-                  <p className="text-red-500 text-sm mt-1">{errors.nome.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">E-mail *</label>
-                <input
-                  {...register('email', {
-                    required: 'E-mail é obrigatório',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'E-mail inválido',
-                    },
-                  })}
-                  type="email"
-                  className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-                  placeholder="seu@email.com"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Telefone/WhatsApp *</label>
-                <input
-                  {...register('telefone', {
-                    required: 'Telefone é obrigatório',
-                    pattern: {
-                      value: /^[\d\s()+-]+$/,
-                      message: 'Telefone inválido',
-                    },
-                  })}
-                  type="tel"
-                  className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-                  placeholder="(00) 00000-0000"
-                />
-                {errors.telefone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.telefone.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">CPF ou CNPJ *</label>
-                <input
-                  {...register('cpfCnpj', {
-                    required: 'CPF ou CNPJ é obrigatório',
-                    validate: (value) => {
-                      if (!validarCpfCnpj(value)) {
-                        return 'CPF ou CNPJ inválido. Verifique os dígitos.';
-                      }
-                      return true;
-                    },
-                  })}
-                  type="text"
-                  maxLength={18}
-                  onChange={(e) => {
-                    const formatted = formatarCpfCnpj(e.target.value);
-                    e.target.value = formatted;
-                    setValue('cpfCnpj', formatted);
-                  }}
-                  className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
-                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
-                />
-                {errors.cpfCnpj && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cpfCnpj.message}</p>
-                )}
-              </div>
+            <div>
+              <label className={labelClasses}>Nome Completo *</label>
+              <input
+                {...register('nome', { required: 'Nome é obrigatório' })}
+                type="text"
+                className={inputClasses}
+                placeholder="Seu nome completo"
+              />
+              {errors.nome && <p className={errorClasses}>{errors.nome.message}</p>}
             </div>
 
-            {/* Resumo e Pagamento - visível apenas no desktop */}
-            <div className="hidden md:block border-t border-zinc-800 pt-6">
-              <h4 className="text-xl font-semibold mb-4">Resumo da Reserva</h4>
+            <div>
+              <label className={labelClasses}>E-mail *</label>
+              <input
+                {...register('email', {
+                  required: 'E-mail é obrigatório',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'E-mail inválido',
+                  },
+                })}
+                type="email"
+                className={inputClasses}
+                placeholder="seu@email.com"
+              />
+              {errors.email && <p className={errorClasses}>{errors.email.message}</p>}
+            </div>
 
-              <div className="bg-black rounded-lg p-6 border border-zinc-700">
-                <div className="flex items-center justify-between pb-4 border-b border-zinc-700 mb-4">
-                  <span className="text-lg text-zinc-400">Valor da Reserva:</span>
-                  <span className="text-3xl font-bold text-[#E53935]">R$ 50,00</span>
+            <div>
+              <label className={labelClasses}>Telefone/WhatsApp *</label>
+              <input
+                {...register('telefone', {
+                  required: 'Telefone é obrigatório',
+                  pattern: {
+                    value: /^[\d\s()+-]+$/,
+                    message: 'Telefone inválido',
+                  },
+                })}
+                type="tel"
+                className={inputClasses}
+                placeholder="(00) 00000-0000"
+              />
+              {errors.telefone && <p className={errorClasses}>{errors.telefone.message}</p>}
+            </div>
+
+            <div>
+              <label className={labelClasses}>CPF ou CNPJ *</label>
+              <input
+                {...register('cpfCnpj', {
+                  required: 'CPF ou CNPJ é obrigatório',
+                  validate: (value) => {
+                    if (!validarCpfCnpj(value)) {
+                      return 'CPF ou CNPJ inválido';
+                    }
+                    return true;
+                  },
+                })}
+                type="text"
+                maxLength={18}
+                onChange={(e) => {
+                  const formatted = formatarCpfCnpj(e.target.value);
+                  e.target.value = formatted;
+                  setValue('cpfCnpj', formatted);
+                }}
+                className={inputClasses}
+                placeholder="000.000.000-00"
+              />
+              {errors.cpfCnpj && <p className={errorClasses}>{errors.cpfCnpj.message}</p>}
+            </div>
+
+            {/* Resumo - Desktop */}
+            <div className="hidden md:block border-t border-white/10 pt-5 mt-6">
+              <div className="bg-black/30 rounded-xl p-5 border border-white/5">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                  <span className="text-sm text-white/60">Valor da Reserva</span>
+                  <span className="text-2xl font-medium text-[#ffc95b]">R$ 50,00</span>
                 </div>
 
-                <div className="bg-zinc-800 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-zinc-300 mb-2">
-                    <strong className="text-[#E53935]">100% conversível</strong> em consumação
-                  </p>
-                  <p className="text-xs text-zinc-400 mb-2">
-                    Este valor retorna integralmente no dia da sua reserva
-                  </p>
-                  <p className="text-xs text-yellow-400 border-t border-zinc-700 pt-2 mt-2">
-                    ⚠️ <strong>Importante:</strong> Em caso de não comparecimento, o valor de R$ 50,00 ficará retido
-                  </p>
-                </div>
+                <p className="text-xs text-white/50 mb-1">
+                  <span className="text-[#25bcc0]">100% conversível</span> em consumação
+                </p>
+                <p className="text-xs text-white/40 mb-3">
+                  Em caso de não comparecimento, o valor ficará retido
+                </p>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-bold text-lg py-5 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="w-full btn-mexican text-white font-medium text-sm py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     'Processando...'
                   ) : (
                     <>
-                      <CreditCard className="w-6 h-6" />
+                      <CreditCard className="w-4 h-4" />
                       Continuar para Pagamento
                     </>
                   )}
                 </button>
 
-                <p className="text-xs text-center text-zinc-500 mt-3">
-                  Pagamento seguro via Asaas
+                <p className="text-xs text-center text-white/30 mt-3">
+                  Pagamento seguro via PIX
                 </p>
               </div>
             </div>
           </div>
 
           {/* Coluna 2: Detalhes da Reserva */}
-          <div className="space-y-4 order-2">
-            <h4 className="text-xl font-semibold flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#E53935]" />
+          <div className="space-y-5 order-2">
+            <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
+              <Calendar className="w-4 h-4 text-[#f98f21]" />
               Detalhes da Reserva
             </h4>
 
             <div>
-              <label className="block text-sm font-medium mb-4">Data *</label>
-              <input
-                type="hidden"
-                {...register('data', { required: 'Selecione uma data' })}
-              />
+              <label className={labelClasses}>Data *</label>
+              <input type="hidden" {...register('data', { required: 'Selecione uma data' })} />
               <CalendarioReserva
                 onSelectDate={handleDateSelect}
                 selectedDate={selectedDate}
               />
-              {errors.data && (
-                <p className="text-red-500 text-sm mt-2">{errors.data.message}</p>
-              )}
+              {errors.data && <p className={errorClasses}>{errors.data.message}</p>}
               {selectedDate && (
-                <p className="text-[#E53935] text-sm mt-2">
-                  Data selecionada: {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
+                <p className="text-[#f98f21] text-xs mt-2">
+                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
                     weekday: 'long',
                     day: '2-digit',
                     month: 'long',
-                    year: 'numeric'
                   })}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Horário *</label>
+              <label className={labelClasses}>Horário *</label>
               <select
                 {...register('horario', { required: 'Horário é obrigatório' })}
-                className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#0e9a20] text-white"
+                className={inputClasses}
               >
-                <option value="">Selecione um horário</option>
+                <option value="">Selecione</option>
                 {horarios.map((horario) => (
                   <option key={horario} value={horario}>
                     {horario}
                   </option>
                 ))}
               </select>
-              {errors.horario && (
-                <p className="text-red-500 text-sm mt-1">{errors.horario.message}</p>
-              )}
+              {errors.horario && <p className={errorClasses}>{errors.horario.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Número de Pessoas *</label>
+              <label className={labelClasses}>Número de Pessoas *</label>
               <input
                 {...register('numeroPessoas', {
                   required: 'Número de pessoas é obrigatório',
                   valueAsNumber: true,
-                  min: {
-                    value: 2,
-                    message: 'Mínimo 2 pessoas'
-                  },
-                  max: {
-                    value: 60,
-                    message: 'Máximo 60 pessoas por reserva'
-                  },
+                  min: { value: 2, message: 'Mínimo 2 pessoas' },
+                  max: { value: 60, message: 'Máximo 60 pessoas' },
                   validate: (value) => {
                     if (value % 2 !== 0) {
-                      return 'Apenas múltiplos de 2 são permitidos';
+                      return 'Apenas múltiplos de 2';
                     }
                     return true;
                   }
@@ -414,69 +373,57 @@ export default function ReservaForm() {
                 min="2"
                 max="60"
                 step="2"
-                placeholder="Digite o número de pessoas (múltiplos de 2)"
-                className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg focus:outline-none focus:border-[#E53935] text-white"
+                placeholder="Número de pessoas"
+                className={inputClasses}
               />
-              {errors.numeroPessoas && (
-                <p className="text-red-500 text-sm mt-1">{errors.numeroPessoas.message}</p>
-              )}
-              <p className="text-xs text-zinc-500 mt-1">
-                Múltiplos de 2 • Mínimo: 2 pessoas • Máximo: 60 pessoas
+              {errors.numeroPessoas && <p className={errorClasses}>{errors.numeroPessoas.message}</p>}
+              <p className="text-xs text-white/40 mt-1">
+                Múltiplos de 2 • Mín: 2 • Máx: 60
               </p>
             </div>
 
             {/* Mapa de Mesas */}
-            <div className="md:col-span-2">
-              <MapaMesas
-                data={watchedData || ''}
-                horario={watchedHorario || ''}
-                numeroPessoas={watchedNumeroPessoas || 0}
-                onMesasSelect={handleMesasSelect}
-              />
-            </div>
+            <MapaMesas
+              data={watchedData || ''}
+              horario={watchedHorario || ''}
+              numeroPessoas={watchedNumeroPessoas || 0}
+              onMesasSelect={handleMesasSelect}
+            />
           </div>
-
         </div>
 
-        {/* Resumo e Pagamento - visível apenas no mobile, fixo no final */}
-        <div className="md:hidden border-t border-zinc-800 pt-6 mt-6">
-          <h4 className="text-xl font-semibold mb-4">Resumo da Reserva</h4>
-
-          <div className="bg-black rounded-lg p-6 border border-zinc-700">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-700 mb-4 gap-2">
-              <span className="text-base text-zinc-400 whitespace-nowrap">Valor da Reserva:</span>
-              <span className="text-2xl font-bold text-[#E53935] whitespace-nowrap">R$ 50,00</span>
+        {/* Resumo - Mobile */}
+        <div className="md:hidden border-t border-white/10 pt-5">
+          <div className="bg-black/30 rounded-xl p-5 border border-white/5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+              <span className="text-sm text-white/60 whitespace-nowrap">Valor da Reserva</span>
+              <span className="text-xl font-medium text-[#ffc95b] whitespace-nowrap">R$ 50,00</span>
             </div>
 
-            <div className="bg-zinc-800 rounded-lg p-4 mb-6">
-              <p className="text-sm text-zinc-300 mb-2">
-                <strong className="text-[#E53935]">100% conversível</strong> em consumação
-              </p>
-              <p className="text-xs text-zinc-400 mb-2">
-                Este valor retorna integralmente no dia da sua reserva
-              </p>
-              <p className="text-xs text-yellow-400 border-t border-zinc-700 pt-2 mt-2">
-                ⚠️ <strong>Importante:</strong> Em caso de não comparecimento, o valor de R$ 50,00 ficará retido
-              </p>
-            </div>
+            <p className="text-xs text-white/50 mb-1">
+              <span className="text-[#25bcc0]">100% conversível</span> em consumação
+            </p>
+            <p className="text-xs text-white/40 mb-3">
+              Em caso de não comparecimento, o valor ficará retido
+            </p>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#E53935] hover:bg-[#B71C1C] text-white font-bold text-base py-4 px-6 rounded-lg transition flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full btn-mexican text-white font-medium text-sm py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 'Processando...'
               ) : (
                 <>
-                  <CreditCard className="w-5 h-5 flex-shrink-0" />
-                  <span>Continuar para Pagamento</span>
+                  <CreditCard className="w-4 h-4" />
+                  Continuar para Pagamento
                 </>
               )}
             </button>
 
-            <p className="text-xs text-center text-zinc-500 mt-3">
-              Pagamento seguro via Asaas
+            <p className="text-xs text-center text-white/30 mt-3">
+              Pagamento seguro via PIX
             </p>
           </div>
         </div>

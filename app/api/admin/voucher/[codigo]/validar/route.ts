@@ -43,18 +43,19 @@ export async function POST(
         );
       }
 
-      // Se é o mesmo dia, verificar se já passou do horário da reserva
-      if (reservationDateStr === todayStr) {
-        const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
-        const reservationTime = hours * 60 + minutes;
-        const currentTime = today.getHours() * 60 + today.getMinutes();
+      // Verificar se já passou do horário da reserva + 10 horas de margem
+      const [hours, minutes] = voucher.reservation.horario.split(':').map(Number);
+      const reservationDateTime = new Date(reservationDateStr + 'T00:00:00');
+      reservationDateTime.setHours(hours, minutes, 0, 0);
 
-        if (currentTime > reservationTime) {
-          return NextResponse.json(
-            { error: 'Voucher expirado - horário da reserva já passou' },
-            { status: 400 }
-          );
-        }
+      // Adicionar 10 horas de margem
+      const expirationTime = new Date(reservationDateTime.getTime() + (10 * 60 * 60 * 1000));
+
+      if (today > expirationTime) {
+        return NextResponse.json(
+          { error: 'Voucher expirado - prazo de 10 horas após a reserva já passou' },
+          { status: 400 }
+        );
       }
     } else if (new Date() > new Date(voucher.dataValidade)) {
       return NextResponse.json(

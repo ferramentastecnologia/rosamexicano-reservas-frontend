@@ -25,25 +25,21 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
 
-  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-  // Gerar datas disponíveis (todos os dias desde hoje até 31 de dezembro)
   const isDateAvailable = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const endDate = new Date(2025, 11, 31); // 31 de dezembro de 2025
+    const endDate = new Date(2025, 11, 31);
     endDate.setHours(23, 59, 59, 999);
 
-    // Normalizar a data para comparação
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
 
-    // Verificar se está entre hoje e 31 de dezembro de 2025
     return checkDate >= today && checkDate <= endDate;
   };
 
-  // Gerar dias do mês
   const getDaysInMonth = () => {
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
@@ -52,12 +48,10 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
 
     const days = [];
 
-    // Adicionar dias vazios do início
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
 
-    // Adicionar dias do mês
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
       days.push({
@@ -86,7 +80,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
 
   const prevMonth = () => {
     if (!today) return;
-    const minMonth = today.getMonth(); // Não pode voltar antes do mês atual
+    const minMonth = today.getMonth();
     if (currentMonth > minMonth) {
       setCurrentMonth(currentMonth - 1);
     }
@@ -96,26 +90,26 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
 
   if (!today) {
     return (
-      <div className="bg-black rounded-lg border border-zinc-700 p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#E53935]"></div>
+      <div className="bg-black/30 rounded-xl border border-white/5 p-5 flex items-center justify-center min-h-[280px]">
+        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#f98f21]"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-black rounded-lg border border-zinc-700 p-6">
-      {/* Header do calendário */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-black/30 rounded-xl border border-white/5 p-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
         <button
           type="button"
           onClick={prevMonth}
           disabled={currentMonth === today.getMonth()}
-          className="p-2 hover:bg-zinc-800 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-1.5 hover:bg-white/5 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4 text-white/70" />
         </button>
 
-        <h3 className="text-xl font-semibold">
+        <h3 className="text-sm font-medium text-white/90">
           {monthNames[currentMonth]} {currentYear}
         </h3>
 
@@ -123,18 +117,18 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
           type="button"
           onClick={nextMonth}
           disabled={currentMonth === 11}
-          className="p-2 hover:bg-zinc-800 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-1.5 hover:bg-white/5 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 h-4 text-white/70" />
         </button>
       </div>
 
       {/* Dias da semana */}
-      <div className="grid grid-cols-7 gap-2 mb-3">
-        {weekDays.map((day) => (
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {weekDays.map((day, i) => (
           <div
-            key={day}
-            className="text-center text-sm font-medium text-zinc-500 py-2"
+            key={i}
+            className="text-center text-xs font-light text-white/40 py-1"
           >
             {day}
           </div>
@@ -142,7 +136,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
       </div>
 
       {/* Dias do mês */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1">
         {days.map((day, index) => {
           if (!day) {
             return <div key={`empty-${index}`} className="aspect-square" />;
@@ -158,12 +152,12 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
               onClick={() => handleDateClick(day)}
               disabled={!day.available}
               className={`
-                aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition
+                aspect-square rounded-lg flex items-center justify-center text-xs font-light transition-all
                 ${day.available
                   ? isSelected
-                    ? 'bg-[#E53935] text-white hover:bg-[#B71C1C]'
-                    : 'bg-zinc-800 text-white hover:bg-[#E53935] hover:text-white'
-                  : 'text-zinc-600 cursor-not-allowed'
+                    ? 'btn-mexican text-white'
+                    : 'bg-white/5 text-white/70 hover:bg-[#f98f21]/20 hover:text-white'
+                  : 'text-white/20 cursor-not-allowed'
                 }
               `}
             >
@@ -173,25 +167,18 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
         })}
       </div>
 
-      {/* Legenda */}
-      <div className="mt-6 pt-4 border-t border-zinc-800">
-        <div className="flex flex-wrap gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-[#E53935]"></div>
-            <span className="text-zinc-400">Data selecionada</span>
+      {/* Legenda simplificada */}
+      <div className="mt-4 pt-3 border-t border-white/5">
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded btn-mexican"></div>
+            <span className="text-white/40">Selecionada</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-zinc-800"></div>
-            <span className="text-zinc-400">Datas disponíveis</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-transparent border border-zinc-700"></div>
-            <span className="text-zinc-400">Indisponíveis</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded bg-white/5"></div>
+            <span className="text-white/40">Disponível</span>
           </div>
         </div>
-        <p className="text-xs text-zinc-500 mt-3">
-          Todos os dias disponíveis até 31 de dezembro de 2025
-        </p>
       </div>
     </div>
   );
