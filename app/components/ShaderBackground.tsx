@@ -16,13 +16,12 @@ interface ShaderBackgroundProps {
 
 export function ShaderBackground({ children }: ShaderBackgroundProps) {
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
+    <div className="min-h-screen w-full relative overflow-hidden bg-[#0a0a0a]">
       {/* Background Shader - Mesh Gradient com cores mexicanas */}
       <MeshGradient
         className="absolute inset-0 w-full h-full"
         colors={['#000000', '#d71919', '#f98f21', '#1a0a0a', '#2d0f0f']}
         speed={0.15}
-        backgroundColor="#0a0a0a"
       />
 
       {/* Overlay escuro para legibilidade */}
@@ -38,12 +37,11 @@ export function ShaderBackground({ children }: ShaderBackgroundProps) {
 
 export function ShaderBackgroundLight({ children }: ShaderBackgroundProps) {
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
+    <div className="min-h-screen w-full relative overflow-hidden bg-[#111111]">
       <MeshGradient
         className="absolute inset-0 w-full h-full opacity-30"
         colors={['#d71919', '#f98f21', '#ffc95b', '#25bcc0', '#234c91']}
         speed={0.1}
-        backgroundColor="#111111"
       />
 
       <div className="absolute inset-0 bg-black/70" />
