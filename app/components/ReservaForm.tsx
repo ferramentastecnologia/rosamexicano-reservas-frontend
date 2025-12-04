@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Calendar, User, CreditCard } from 'lucide-react';
+import { Calendar, User, CreditCard, Clock, ChevronDown } from 'lucide-react';
 import CalendarioReserva from './CalendarioReserva';
 import MapaMesas from './MapaMesas';
 
@@ -103,6 +103,20 @@ export default function ReservaForm() {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTables, setSelectedTables] = useState<number[]>([]);
+  const [horarioDropdownOpen, setHorarioDropdownOpen] = useState(false);
+  const [selectedHorario, setSelectedHorario] = useState<string>('');
+  const horarioDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (horarioDropdownRef.current && !horarioDropdownRef.current.contains(event.target as Node)) {
+        setHorarioDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const {
     register,
@@ -340,17 +354,46 @@ export default function ReservaForm() {
 
             <div>
               <label className={labelClasses}>Horário *</label>
-              <select
-                {...register('horario', { required: 'Horário é obrigatório' })}
-                className={inputClasses}
-              >
-                <option value="">Selecione</option>
-                {horarios.map((horario) => (
-                  <option key={horario} value={horario}>
-                    {horario}
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" {...register('horario', { required: 'Horário é obrigatório' })} />
+              <div ref={horarioDropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setHorarioDropdownOpen(!horarioDropdownOpen)}
+                  className={`${inputClasses} flex items-center justify-between cursor-pointer`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#f98f21]" />
+                    <span className={selectedHorario ? 'text-white' : 'text-white/30'}>
+                      {selectedHorario || 'Selecione o horário'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${horarioDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {horarioDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden shadow-xl">
+                    {horarios.map((horario) => (
+                      <button
+                        key={horario}
+                        type="button"
+                        onClick={() => {
+                          setSelectedHorario(horario);
+                          setValue('horario', horario);
+                          setHorarioDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-colors ${
+                          selectedHorario === horario
+                            ? 'bg-gradient-to-r from-[#d71919] to-[#f98f21] text-white'
+                            : 'text-white/70 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        <Clock className="w-4 h-4" />
+                        <span className="font-medium">{horario}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {errors.horario && <p className={errorClasses}>{errors.horario.message}</p>}
             </div>
 
