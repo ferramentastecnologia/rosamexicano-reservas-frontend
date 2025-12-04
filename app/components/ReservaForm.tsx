@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Calendar, User, CreditCard, Clock, ChevronDown } from 'lucide-react';
+import { Calendar, User, CreditCard, Clock, ChevronDown, Users, MapPin } from 'lucide-react';
 import CalendarioReserva from './CalendarioReserva';
 import MapaMesas from './MapaMesas';
+import { TableArea, AREA_NAMES, AREA_DESCRIPTIONS } from '@/lib/tables-config';
 
 // Função para validar CPF
 function validarCPF(cpf: string): boolean {
@@ -105,6 +106,7 @@ export default function ReservaForm() {
   const [selectedTables, setSelectedTables] = useState<number[]>([]);
   const [horarioDropdownOpen, setHorarioDropdownOpen] = useState(false);
   const [selectedHorario, setSelectedHorario] = useState<string>('');
+  const [selectedArea, setSelectedArea] = useState<TableArea | null>(null);
   const horarioDropdownRef = useRef<HTMLDivElement>(null);
 
   // Fechar dropdown ao clicar fora
@@ -211,9 +213,10 @@ export default function ReservaForm() {
   return (
     <div className="glass-strong rounded-2xl p-6 md:p-8">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Linha 1: Dados Pessoais | Data e Horário */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
           {/* Coluna 1: Dados Pessoais */}
-          <div className="space-y-5 order-1">
+          <div className="space-y-5">
             <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
               <User className="w-4 h-4 text-[#f98f21]" />
               Seus Dados
@@ -289,48 +292,71 @@ export default function ReservaForm() {
               {errors.cpfCnpj && <p className={errorClasses}>{errors.cpfCnpj.message}</p>}
             </div>
 
-            {/* Resumo - Desktop */}
-            <div className="hidden md:block border-t border-white/10 pt-5 mt-6">
-              <div className="bg-black/30 rounded-xl p-5 border border-white/5">
-                <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-                  <span className="text-sm text-white/60">Valor da Reserva</span>
-                  <span className="text-2xl font-medium text-[#ffc95b]">R$ 50,00</span>
-                </div>
+            {/* Número de Pessoas */}
+            <div>
+              <label className={labelClasses}>
+                <Users className="w-3.5 h-3.5 inline mr-1.5 text-[#f98f21]" />
+                Número de Pessoas *
+              </label>
+              <input
+                {...register('numeroPessoas', {
+                  required: 'Número de pessoas é obrigatório',
+                  valueAsNumber: true,
+                  min: { value: 2, message: 'Mínimo 2 pessoas' },
+                  max: { value: 60, message: 'Máximo 60 pessoas' },
+                  validate: (value) => {
+                    if (value % 2 !== 0) {
+                      return 'Apenas múltiplos de 2';
+                    }
+                    return true;
+                  }
+                })}
+                type="number"
+                min="2"
+                max="60"
+                step="2"
+                placeholder="Número de pessoas"
+                className={inputClasses}
+              />
+              {errors.numeroPessoas && <p className={errorClasses}>{errors.numeroPessoas.message}</p>}
+              <p className="text-xs text-white/40 mt-1">
+                Múltiplos de 2 • Mín: 2 • Máx: 60
+              </p>
+            </div>
 
-                <p className="text-xs text-white/50 mb-1">
-                  <span className="text-[#25bcc0]">100% conversível</span> em consumação
-                </p>
-                <p className="text-xs text-white/40 mb-3">
-                  Em caso de não comparecimento, o valor ficará retido
-                </p>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full btn-mexican text-white font-medium text-sm py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    'Processando...'
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4" />
-                      Continuar para Pagamento
-                    </>
-                  )}
-                </button>
-
-                <p className="text-xs text-center text-white/30 mt-3">
-                  Pagamento seguro via PIX
-                </p>
+            {/* Seleção de Área */}
+            <div>
+              <label className={labelClasses}>
+                <MapPin className="w-3.5 h-3.5 inline mr-1.5 text-[#f98f21]" />
+                Área do Restaurante *
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['interno', 'semi-externo', 'externo'] as TableArea[]).map((area) => (
+                  <button
+                    key={area}
+                    type="button"
+                    onClick={() => setSelectedArea(area)}
+                    className={`
+                      p-3 rounded-xl border transition-all duration-200 text-center
+                      ${selectedArea === area
+                        ? 'bg-gradient-to-r from-[#d71919] to-[#f98f21] border-transparent text-white shadow-lg'
+                        : 'bg-white/5 border-white/10 text-white/70 hover:border-[#f98f21]/50 hover:bg-white/10'
+                      }
+                    `}
+                  >
+                    <p className="font-medium text-xs">{AREA_NAMES[area]}</p>
+                    <p className="text-[10px] mt-0.5 opacity-70">{AREA_DESCRIPTIONS[area]}</p>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Coluna 2: Detalhes da Reserva */}
-          <div className="space-y-5 order-2">
+          {/* Coluna 2: Data e Horário */}
+          <div className="space-y-5">
             <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
               <Calendar className="w-4 h-4 text-[#f98f21]" />
-              Detalhes da Reserva
+              Data e Horário
             </h4>
 
             <div>
@@ -396,77 +422,55 @@ export default function ReservaForm() {
               </div>
               {errors.horario && <p className={errorClasses}>{errors.horario.message}</p>}
             </div>
-
-            <div>
-              <label className={labelClasses}>Número de Pessoas *</label>
-              <input
-                {...register('numeroPessoas', {
-                  required: 'Número de pessoas é obrigatório',
-                  valueAsNumber: true,
-                  min: { value: 2, message: 'Mínimo 2 pessoas' },
-                  max: { value: 60, message: 'Máximo 60 pessoas' },
-                  validate: (value) => {
-                    if (value % 2 !== 0) {
-                      return 'Apenas múltiplos de 2';
-                    }
-                    return true;
-                  }
-                })}
-                type="number"
-                min="2"
-                max="60"
-                step="2"
-                placeholder="Número de pessoas"
-                className={inputClasses}
-              />
-              {errors.numeroPessoas && <p className={errorClasses}>{errors.numeroPessoas.message}</p>}
-              <p className="text-xs text-white/40 mt-1">
-                Múltiplos de 2 • Mín: 2 • Máx: 60
-              </p>
-            </div>
-
-            {/* Mapa de Mesas */}
-            <MapaMesas
-              data={watchedData || ''}
-              horario={watchedHorario || ''}
-              numeroPessoas={watchedNumeroPessoas || 0}
-              onMesasSelect={handleMesasSelect}
-            />
           </div>
         </div>
 
-        {/* Resumo - Mobile */}
-        <div className="md:hidden border-t border-white/10 pt-5">
-          <div className="bg-black/30 rounded-xl p-5 border border-white/5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-              <span className="text-sm text-white/60 whitespace-nowrap">Valor da Reserva</span>
-              <span className="text-xl font-medium text-[#ffc95b] whitespace-nowrap">R$ 50,00</span>
+        {/* Linha 2: Mapa de Mesas (largura total) */}
+        <div className="border-t border-white/10 pt-6">
+          <MapaMesas
+            data={watchedData || ''}
+            horario={watchedHorario || ''}
+            numeroPessoas={watchedNumeroPessoas || 0}
+            selectedArea={selectedArea}
+            onMesasSelect={handleMesasSelect}
+          />
+        </div>
+
+        {/* Linha 3: Resumo e Botão de Pagamento */}
+        <div className="border-t border-white/10 pt-6">
+          <div className="bg-gradient-to-r from-[#d71919]/10 via-[#f98f21]/10 to-[#ffc95b]/10 rounded-xl p-5 border border-white/10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              {/* Info do valor */}
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm text-white/60 mb-1">Valor da Reserva</p>
+                  <p className="text-3xl font-bold text-[#ffc95b]">R$ 50,00</p>
+                </div>
+                <div className="border-l border-white/10 pl-4">
+                  <p className="text-xs text-[#25bcc0] font-medium">100% conversível</p>
+                  <p className="text-xs text-white/40">em consumação</p>
+                </div>
+              </div>
+
+              {/* Botão */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full md:w-auto bg-gradient-to-r from-[#d71919] to-[#f98f21] hover:from-[#b71515] hover:to-[#d97a1c] text-white font-bold text-base px-8 py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#d71919]/30 hover:scale-105"
+              >
+                {loading ? (
+                  'Processando...'
+                ) : (
+                  <>
+                    <CreditCard className="w-5 h-5" />
+                    Continuar para Pagamento
+                  </>
+                )}
+              </button>
             </div>
 
-            <p className="text-xs text-white/50 mb-1">
-              <span className="text-[#25bcc0]">100% conversível</span> em consumação
-            </p>
-            <p className="text-xs text-white/40 mb-3">
-              Em caso de não comparecimento, o valor ficará retido
-            </p>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-mexican text-white font-medium text-sm py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                'Processando...'
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4" />
-                  Continuar para Pagamento
-                </>
-              )}
-            </button>
-
-            <p className="text-xs text-center text-white/30 mt-3">
-              Pagamento seguro via PIX
+            <p className="text-xs text-white/30 mt-3 text-center md:text-left">
+              Em caso de não comparecimento, o valor ficará retido • Pagamento seguro via PIX
             </p>
           </div>
         </div>

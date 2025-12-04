@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Check, X, Users, MapPin } from 'lucide-react';
-import { TableArea, AREA_NAMES, AREA_DESCRIPTIONS } from '@/lib/tables-config';
+import { Check, X, Users } from 'lucide-react';
+import { TableArea, AREA_NAMES } from '@/lib/tables-config';
 
 type Mesa = {
   number: number;
@@ -15,14 +15,13 @@ type MapaMesasProps = {
   data: string;
   horario: string;
   numeroPessoas: number;
+  selectedArea: TableArea | null;
   onMesasSelect: (mesas: number[]) => void;
-  onAreaSelect?: (area: TableArea) => void;
 };
 
-export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect, onAreaSelect }: MapaMesasProps) {
+export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, onMesasSelect }: MapaMesasProps) {
   const [tables, setTables] = useState<Mesa[]>([]);
   const [selectedTables, setSelectedTables] = useState<number[]>([]);
-  const [selectedArea, setSelectedArea] = useState<TableArea | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -71,11 +70,6 @@ export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect,
     }
   };
 
-  const handleAreaSelect = (area: TableArea) => {
-    setSelectedArea(area);
-    onAreaSelect?.(area);
-  };
-
   const toggleTable = (tableNumber: number) => {
     const table = tables.find(t => t.number === tableNumber);
     if (!table || !table.available) return;
@@ -106,9 +100,10 @@ export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect,
 
   if (!data || !horario) {
     return (
-      <div className="bg-black/30 rounded-xl p-5 border border-white/5">
-        <p className="text-white/40 text-center text-sm">
-          Selecione data e horário para ver as mesas
+      <div className="bg-black/20 rounded-xl p-8 border border-white/5 text-center">
+        <Users className="w-10 h-10 text-white/20 mx-auto mb-3" />
+        <p className="text-white/40 text-sm">
+          Selecione a <span className="text-[#f98f21]">data</span> e o <span className="text-[#f98f21]">horário</span> para ver as mesas
         </p>
       </div>
     );
@@ -116,166 +111,128 @@ export default function MapaMesas({ data, horario, numeroPessoas, onMesasSelect,
 
   if (!pessoasValidas) {
     return (
-      <div className="bg-black/30 rounded-xl p-5 border border-white/5">
-        <p className="text-white/40 text-center text-sm">
-          Informe o número de pessoas para selecionar mesas
+      <div className="bg-black/20 rounded-xl p-8 border border-white/5 text-center">
+        <Users className="w-10 h-10 text-white/20 mx-auto mb-3" />
+        <p className="text-white/40 text-sm">
+          Informe o <span className="text-[#f98f21]">número de pessoas</span> para selecionar mesas
+        </p>
+      </div>
+    );
+  }
+
+  if (!selectedArea) {
+    return (
+      <div className="bg-black/20 rounded-xl p-8 border border-white/5 text-center">
+        <Users className="w-10 h-10 text-white/20 mx-auto mb-3" />
+        <p className="text-white/40 text-sm">
+          Selecione a <span className="text-[#f98f21]">área do restaurante</span> para ver as mesas
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-black/30 rounded-xl p-4 border border-white/5">
-      <h4 className="text-sm font-light mb-4 flex items-center gap-2 text-white/90">
-        <Users className="w-4 h-4 text-[#f98f21]" />
-        Seleção de Mesas
-      </h4>
-
-      {/* Seletor de Área */}
-      <div className="mb-4">
-        <label className="block text-xs font-light text-white/50 mb-2 flex items-center gap-1.5">
-          <MapPin className="w-3 h-3 text-[#f98f21]" />
-          Área do restaurante
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {(['interno', 'semi-externo', 'externo'] as TableArea[]).map((area) => (
-            <button
-              key={area}
-              type="button"
-              onClick={() => handleAreaSelect(area)}
-              className={`
-                p-3 rounded-xl border transition-all duration-200 text-center
-                ${selectedArea === area
-                  ? 'btn-mexican border-transparent text-white'
-                  : 'bg-white/5 border-white/5 text-white/70 hover:border-[#f98f21]/50 hover:bg-white/10'
-                }
-              `}
-            >
-              <p className="font-medium text-xs">{AREA_NAMES[area]}</p>
-              <p className="text-[10px] mt-0.5 opacity-60">{AREA_DESCRIPTIONS[area]}</p>
-            </button>
-          ))}
+    <div className="bg-black/20 rounded-xl p-4 md:p-6 border border-white/5">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-sm font-medium flex items-center gap-2 text-white/90">
+          <Users className="w-4 h-4 text-[#f98f21]" />
+          Mesas - {AREA_NAMES[selectedArea]}
+        </h4>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-white/40">Selecionadas:</span>
+          <span className={`font-bold ${selecaoCompleta ? 'text-[#25bcc0]' : 'text-[#ffc95b]'}`}>
+            {selectedTables.length}/{mesasNecessarias}
+          </span>
         </div>
       </div>
 
-      {selectedArea ? (
+      {/* Status da Seleção */}
+      {selectedTables.length > 0 && (
+        <div className={`mb-4 p-3 rounded-lg border ${
+          selecaoCompleta
+            ? 'bg-[#25bcc0]/10 border-[#25bcc0]/30'
+            : 'bg-[#ffc95b]/10 border-[#ffc95b]/30'
+        }`}>
+          <p className={`text-xs font-medium ${selecaoCompleta ? 'text-[#25bcc0]' : 'text-[#ffc95b]'}`}>
+            {selecaoCompleta ? (
+              <>
+                <Check className="w-3.5 h-3.5 inline mr-1" />
+                Seleção completa! Mesas: {selectedTables.join(', ')}
+              </>
+            ) : (
+              <>Selecione mais {mesasNecessarias - selectedTables.length} mesa(s)</>
+            )}
+          </p>
+        </div>
+      )}
+
+      {/* Grid de Mesas */}
+      {loading ? (
+        <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="aspect-square rounded-lg bg-white/5 animate-pulse" />
+          ))}
+        </div>
+      ) : tables.length > 0 ? (
         <>
-          {/* Informações */}
-          <div className="mb-3 bg-black/40 rounded-lg p-3 border border-white/5">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <p className="text-[10px] text-white/40">Pessoas</p>
-                <p className="text-base font-medium text-[#f98f21]">{numeroPessoas}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-white/40">Necessárias</p>
-                <p className="text-base font-medium text-white">{mesasNecessarias}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-white/40">Selecionadas</p>
-                <p className={`text-base font-medium ${selecaoCompleta ? 'text-[#25bcc0]' : 'text-[#ffc95b]'}`}>
-                  {selectedTables.length}/{mesasNecessarias}
-                </p>
-              </div>
-            </div>
+          <div className="mb-3 text-xs text-white/40">
+            {tables.filter(t => t.available).length} mesas disponíveis • Clique para selecionar
+          </div>
+          <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
+            {tables.map(table => {
+              const isSelected = selectedTables.includes(table.number);
+              const isAvailable = table.available;
+
+              return (
+                <button
+                  key={table.number}
+                  type="button"
+                  onClick={() => toggleTable(table.number)}
+                  disabled={!isAvailable}
+                  className={`
+                    aspect-square rounded-lg border flex flex-col items-center justify-center
+                    transition-all duration-200 relative
+                    ${isSelected
+                      ? 'bg-gradient-to-br from-[#d71919] to-[#f98f21] border-transparent text-white scale-105 shadow-lg shadow-[#d71919]/30'
+                      : isAvailable
+                        ? 'bg-white/5 border-white/10 text-white/70 hover:border-[#f98f21]/50 hover:bg-white/10 hover:scale-105'
+                        : 'bg-black/30 border-white/5 text-white/20 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {isSelected && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#25bcc0] rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-2.5 h-2.5 text-white" />
+                    </div>
+                  )}
+                  <span className="text-sm font-bold">{table.number}</span>
+                  <span className="text-[9px]">
+                    {isAvailable ? `${table.capacity}p` : <X className="w-3 h-3" />}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Status */}
-          {selectedTables.length > 0 && (
-            <div className={`mb-3 p-2.5 rounded-lg border ${
-              selecaoCompleta
-                ? 'bg-[#25bcc0]/10 border-[#25bcc0]/30'
-                : 'bg-[#ffc95b]/10 border-[#ffc95b]/30'
-            }`}>
-              <p className={`text-xs ${selecaoCompleta ? 'text-[#25bcc0]' : 'text-[#ffc95b]'}`}>
-                {selecaoCompleta ? (
-                  <>
-                    <Check className="w-3 h-3 inline mr-1" />
-                    Mesas: {selectedTables.join(', ')}
-                  </>
-                ) : (
-                  <>Selecione mais {mesasNecessarias - selectedTables.length} mesa(s)</>
-                )}
-              </p>
-            </div>
-          )}
-
-          {/* Mesas */}
-          {loading ? (
-            <div className="grid grid-cols-5 gap-2">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="aspect-square rounded-lg bg-white/5 animate-pulse" />
-              ))}
-            </div>
-          ) : tables.length > 0 ? (
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-[10px] text-white/40">
-                  {tables.filter(t => t.available).length} disponíveis
-                </p>
-              </div>
-              <div className="grid grid-cols-5 gap-2">
-                {tables.map(table => {
-                  const isSelected = selectedTables.includes(table.number);
-                  const isAvailable = table.available;
-
-                  return (
-                    <button
-                      key={table.number}
-                      type="button"
-                      onClick={() => toggleTable(table.number)}
-                      disabled={!isAvailable}
-                      className={`
-                        aspect-square rounded-lg border flex flex-col items-center justify-center
-                        transition-all duration-200 relative
-                        ${isSelected
-                          ? 'btn-mexican border-transparent text-white scale-105'
-                          : isAvailable
-                            ? 'bg-white/5 border-white/10 text-white/70 hover:border-[#f98f21]/50 hover:scale-105'
-                            : 'bg-black/30 border-white/5 text-white/20 cursor-not-allowed'
-                        }
-                      `}
-                    >
-                      {isSelected && (
-                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#25bcc0] rounded-full flex items-center justify-center">
-                          <Check className="w-2.5 h-2.5 text-white" />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium">{table.number}</span>
-                      <span className="text-[10px]">
-                        {isAvailable ? `${table.capacity}p` : <X className="w-3 h-3" />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-6 text-white/40">
-              <p className="text-xs">Nenhuma mesa nesta área</p>
-            </div>
-          )}
-
           {/* Legenda */}
-          <div className="mt-3 flex gap-3 text-[10px] text-white/40 justify-center">
-            <div className="flex items-center gap-1">
+          <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-4 text-[10px] text-white/40 justify-center">
+            <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 bg-white/5 border border-white/10 rounded"></div>
               <span>Disponível</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 btn-mexican rounded"></div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 bg-gradient-to-br from-[#d71919] to-[#f98f21] rounded"></div>
               <span>Selecionada</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 bg-black/30 border border-white/5 rounded"></div>
               <span>Ocupada</span>
             </div>
           </div>
         </>
       ) : (
-        <div className="text-center py-6 text-white/40 border border-dashed border-white/10 rounded-lg">
-          <MapPin className="w-6 h-6 mx-auto mb-2 opacity-40" />
-          <p className="text-xs">Selecione uma área acima</p>
+        <div className="text-center py-8 text-white/40">
+          <p className="text-sm">Nenhuma mesa disponível nesta área</p>
         </div>
       )}
     </div>
