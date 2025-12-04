@@ -27,6 +27,16 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
 
   const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
+  // Dias em que o restaurante estará fechado
+  const closedDates = [
+    '2024-12-24', // Véspera de Natal
+    '2024-12-25', // Natal
+    '2024-12-31', // Réveillon
+    '2025-12-24', // Véspera de Natal 2025
+    '2025-12-25', // Natal 2025
+    '2025-12-31', // Réveillon 2025
+  ];
+
   const isDateAvailable = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -37,7 +47,18 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
 
-    return checkDate >= today && checkDate <= endDate;
+    // Verificar se está no período válido
+    if (checkDate < today || checkDate > endDate) {
+      return false;
+    }
+
+    // Verificar se é um dia fechado
+    const dateStr = checkDate.toISOString().split('T')[0];
+    if (closedDates.includes(dateStr)) {
+      return false;
+    }
+
+    return true;
   };
 
   const getDaysInMonth = () => {
@@ -167,9 +188,9 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
         })}
       </div>
 
-      {/* Legenda simplificada */}
+      {/* Legenda */}
       <div className="mt-4 pt-3 border-t border-white/5">
-        <div className="flex gap-4 text-xs">
+        <div className="flex flex-wrap gap-3 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded btn-mexican"></div>
             <span className="text-white/40">Selecionada</span>
@@ -179,6 +200,9 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
             <span className="text-white/40">Disponível</span>
           </div>
         </div>
+        <p className="text-[10px] text-white/30 mt-2">
+          Fechado: 24/12, 25/12 e 31/12
+        </p>
       </div>
     </div>
   );
