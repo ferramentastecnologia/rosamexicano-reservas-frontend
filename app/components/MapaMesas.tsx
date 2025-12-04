@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Check, X, Users } from 'lucide-react';
 import { TableArea, AREA_NAMES } from '@/lib/tables-config';
 
@@ -19,16 +19,70 @@ type MapaMesasProps = {
   onMesasSelect: (mesas: number[]) => void;
 };
 
+// Cache local para evitar requisições repetidas
+const tablesCache = new Map<string, { tables: Mesa[]; timestamp: number }>();
+const CACHE_TTL = 30000; // 30 segundos
+
 export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, onMesasSelect }: MapaMesasProps) {
   const [tables, setTables] = useState<Mesa[]>([]);
   const [selectedTables, setSelectedTables] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const loadAvailableTables = useCallback(async () => {
+    if (!selectedArea || !data) return;
+
+    // Verificar cache local
+    const cacheKey = `${data}-${selectedArea}`;
+    const cached = tablesCache.get(cacheKey);
+
+    if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+      setTables(cached.tables);
+      return;
+    }
+
+    // Cancelar requisição anterior se existir
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/get-available-tables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data, area: selectedArea }),
+        signal: abortControllerRef.current.signal,
+      });
+
+      const result = await response.json();
+
+      if (result.tables) {
+        setTables(result.tables);
+        // Salvar no cache
+        tablesCache.set(cacheKey, { tables: result.tables, timestamp: Date.now() });
+      } else {
+        setTables([]);
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Erro ao carregar mesas:', error);
+        setTables([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [data, selectedArea]);
 
   useEffect(() => {
-    if (data && horario && selectedArea) {
+    if (data && selectedArea) {
       loadAvailableTables();
     }
-  }, [data, horario, selectedArea]);
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, [data, selectedArea, loadAvailableTables]);
 
   useEffect(() => {
     if (numeroPessoas > 0) {
@@ -40,35 +94,6 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
     setSelectedTables([]);
     onMesasSelect([]);
   }, [selectedArea]);
-
-  const loadAvailableTables = async () => {
-    if (!selectedArea) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch('/api/get-available-tables', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data, horario, area: selectedArea }),
-      });
-
-      const result = await response.json();
-
-      if (result.error) {
-        console.error('Erro na API:', result.error);
-        setTables([]);
-      } else if (result.tables) {
-        setTables(result.tables);
-      } else {
-        setTables([]);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar mesas:', error);
-      setTables([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const toggleTable = (tableNumber: number) => {
     const table = tables.find(t => t.number === tableNumber);

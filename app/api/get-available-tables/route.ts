@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { ALL_TABLES, TOTAL_TABLES, TableArea, getTablesByArea } from '@/lib/tables-config';
+import { ALL_TABLES, TableArea, getTablesByArea } from '@/lib/tables-config';
+
+// Cache em memória para reduzir queries ao banco
+const cache = new Map<string, { data: Set<number>; timestamp: number }>();
+const CACHE_TTL = 30000; // 30 segundos
 
 export async function POST(request: Request) {
+  const startTime = Date.now();
+
   try {
-    const { data, horario, area } = await request.json();
+    const { data, area } = await request.json();
 
     if (!data) {
       return NextResponse.json(
@@ -13,33 +19,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar TODAS as reservas CONFIRMADAS da DATA
-    // Apenas reservas com pagamento confirmado bloqueiam mesas
-    const reservations = await prisma.reservation.findMany({
-      where: {
-        data: data,
-        status: 'confirmed' // Apenas confirmadas bloqueiam mesas
-      },
-      select: {
-        mesasSelecionadas: true,
-        numeroPessoas: true,
-      }
-    });
+    // Verificar cache
+    const cacheKey = `tables-${data}`;
+    const cached = cache.get(cacheKey);
+    let occupiedTables: Set<number>;
 
-    // Coletar todas as mesas ocupadas
-    const occupiedTables = new Set<number>();
-    reservations.forEach(reservation => {
-      if (reservation.mesasSelecionadas) {
-        try {
-          const tables = JSON.parse(reservation.mesasSelecionadas);
-          tables.forEach((tableNum: number) => occupiedTables.add(tableNum));
-        } catch (e) {
-          console.error('Erro ao parsear mesas:', e);
+    if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+      // Usar dados do cache
+      occupiedTables = cached.data;
+    } else {
+      // Buscar do banco - query otimizada apenas com campos necessários
+      const reservations = await prisma.reservation.findMany({
+        where: {
+          data: data,
+          status: 'confirmed'
+        },
+        select: {
+          mesasSelecionadas: true
+        }
+      });
+
+      // Processar mesas ocupadas
+      occupiedTables = new Set<number>();
+      for (const reservation of reservations) {
+        if (reservation.mesasSelecionadas) {
+          try {
+            const tables = JSON.parse(reservation.mesasSelecionadas);
+            for (const tableNum of tables) {
+              occupiedTables.add(tableNum);
+            }
+          } catch {
+            // Ignora erro de parse silenciosamente
+          }
         }
       }
-    });
 
-    // Filtrar mesas por área se especificada
+      // Salvar no cache
+      cache.set(cacheKey, { data: occupiedTables, timestamp: Date.now() });
+    }
+
+    // Filtrar mesas por área
     const tablesToShow = area
       ? getTablesByArea(area as TableArea)
       : ALL_TABLES;
@@ -50,49 +69,47 @@ export async function POST(request: Request) {
       available: !occupiedTables.has(tableConfig.number),
       capacity: tableConfig.capacity,
       area: tableConfig.area,
-      description: tableConfig.description,
     }));
 
-    // Contar mesas disponíveis e capacidade total
-    const availableTablesList = tables.filter(t => t.available);
-    const totalCapacity = availableTablesList.reduce((sum, t) => sum + t.capacity, 0);
+    // Calcular resumo
+    const availableCount = tables.filter(t => t.available).length;
+    const totalCapacity = tables.reduce((sum, t) => t.available ? sum + t.capacity : sum, 0);
 
-    // Adicionar headers de cache para melhorar performance
+    const responseTime = Date.now() - startTime;
+
     return NextResponse.json({
       tables,
       summary: {
         totalTables: tablesToShow.length,
-        availableTables: availableTablesList.length,
-        occupiedTables: tables.length - availableTablesList.length,
+        availableTables: availableCount,
+        occupiedTables: tables.length - availableCount,
         totalCapacity,
         area: area || 'all',
-      }
+      },
+      _meta: { responseTime }
     }, {
       headers: {
-        'Cache-Control': 'private, max-age=10, stale-while-revalidate=30',
+        'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
       }
     });
 
   } catch (error) {
-    console.error('Erro ao buscar mesas disponíveis:', error);
+    console.error('Erro ao buscar mesas:', error);
 
-    const { area } = await request.json().catch(() => ({ area: null }));
+    // Fallback: retornar mesas como disponíveis
+    let area: TableArea | null = null;
+    try {
+      const body = await request.clone().json();
+      area = body.area;
+    } catch {}
 
-    // Filtrar mesas por área se especificada
-    const tablesToShow = area
-      ? getTablesByArea(area as TableArea)
-      : ALL_TABLES;
-
-    // Em caso de erro, retornar mesas como disponíveis
-    const tables = tablesToShow.map(tableConfig => ({
-      number: tableConfig.number,
+    const tablesToShow = area ? getTablesByArea(area) : ALL_TABLES;
+    const tables = tablesToShow.map(t => ({
+      number: t.number,
       available: true,
-      capacity: tableConfig.capacity,
-      area: tableConfig.area,
-      description: tableConfig.description,
+      capacity: t.capacity,
+      area: t.area,
     }));
-
-    const totalCapacity = tables.reduce((sum, t) => sum + t.capacity, 0);
 
     return NextResponse.json({
       tables,
@@ -100,10 +117,10 @@ export async function POST(request: Request) {
         totalTables: tablesToShow.length,
         availableTables: tablesToShow.length,
         occupiedTables: 0,
-        totalCapacity,
+        totalCapacity: tables.reduce((sum, t) => sum + t.capacity, 0),
         area: area || 'all',
       },
-      warning: 'Não foi possível verificar reservas existentes. Mostrando todas as mesas como disponíveis.'
+      warning: 'Fallback: mostrando todas as mesas como disponíveis.'
     });
   }
 }
