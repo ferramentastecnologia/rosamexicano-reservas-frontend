@@ -136,8 +136,23 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Divisor decorativo */}
+        <div className="relative h-32 bg-gradient-to-b from-black via-[#C2185B]/30 to-[#C2185B]/20 flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="text-4xl"
+            >
+              🌮
+            </motion.div>
+          </div>
+          {/* Linha decorativa com gradiente */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FFD700] to-transparent" />
+        </div>
+
         {/* Benefícios com cores */}
-        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/20 via-[#BA68C8]/15 to-[#FFD700]/10">
+        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/15 via-[#BA68C8]/12 to-[#FFD700]/10">
           <div className="container mx-auto max-w-5xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Por que escolher o <span className="text-[#FFD700]">Rosa Mexicano</span>?
@@ -178,6 +193,19 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Divisor decorativo */}
+        <div className="relative h-24 bg-gradient-to-b from-[#FFD700]/10 via-[#BA68C8]/20 to-[#BA68C8]/15 flex items-center justify-center overflow-hidden">
+          {/* Linha decorativa com gradiente */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#C2185B] to-transparent" />
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="text-3xl"
+          >
+            ✨
+          </motion.div>
+        </div>
 
         {/* Formulário de Reserva */}
         <section id="reserva" className="py-16 px-4 bg-gradient-to-b from-[#BA68C8]/15 via-[#C2185B]/10 to-[#FFD700]/15">
