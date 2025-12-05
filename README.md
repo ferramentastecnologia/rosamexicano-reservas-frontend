@@ -1,6 +1,6 @@
-# Mortadella - Sistema de Reservas Final de Ano
+# Rosa Mexicano - Sistema de Reservas Final de Ano
 
-Landing page para reservas de confraternização de final de ano do Mortadella Ristorante & Pizzeria com integração de pagamento via Asaas.
+Landing page para reservas de confraternização de final de ano do Rosa Mexicano Restaurante com integração de pagamento via Asaas.
 
 ## Funcionalidades
 
@@ -27,7 +27,7 @@ Landing page para reservas de confraternização de final de ano do Mortadella R
 
 1. Clone o repositório:
 ```bash
-cd meu-repositorio/mortadella-reservas-final-ano
+cd meu-repositorio/rosamexicano-reservas
 ```
 
 2. Instale as dependências:
@@ -97,7 +97,7 @@ Quando estiver pronto para produção:
 ## Estrutura do Projeto
 
 ```
-mortadella-reservas-final-ano/
+rosamexicano-reservas/
 ├── app/
 │   ├── api/
 │   │   ├── checkout/

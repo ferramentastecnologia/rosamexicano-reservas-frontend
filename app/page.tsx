@@ -29,7 +29,7 @@ export default function Home() {
           <div className="flex items-center">
             <button
               onClick={scrollToReserva}
-              className="text-xs text-white bg-[#d71919] hover:bg-[#b71515] px-5 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-[#d71919]/30"
+              className="text-xs text-white bg-[#C2185B] hover:bg-[#a8155a] px-5 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-[#C2185B]/30"
             >
               Reservar Mesa
             </button>
@@ -48,8 +48,8 @@ export default function Home() {
               priority
             />
             {/* Gradiente colorido sobre a imagem */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#d71919]/40 via-[#f98f21]/20 to-black/80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#234c91]/30 via-transparent to-[#25bcc0]/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#C2185B]/40 via-[#BA68C8]/20 to-black/80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#BA68C8]/30 via-transparent to-[#FFD700]/20" />
           </div>
 
           {/* Conteúdo do Hero */}
@@ -60,7 +60,7 @@ export default function Home() {
               transition={{ duration: 0.8 }}
             >
               {/* Badge colorido */}
-              <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-[#ffc95b] to-[#f98f21] text-black text-xs font-bold mb-6 shadow-lg">
+              <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-[#FFD700] to-[#C2185B] text-white text-xs font-bold mb-6 shadow-lg">
                 Final de Ano 2024/2025
               </div>
 
@@ -68,7 +68,7 @@ export default function Home() {
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
                 <span className="text-white drop-shadow-lg">Celebre com</span>
                 <br />
-                <span className="text-[#ffc95b] drop-shadow-lg">Sabor Mexicano</span>
+                <span className="text-[#FFD700] drop-shadow-lg">Sabor Mexicano</span>
               </h1>
 
               {/* Descrição */}
@@ -79,10 +79,10 @@ export default function Home() {
               {/* Destaque do valor */}
               <div className="inline-flex flex-col items-center gap-2 bg-white/10 backdrop-blur-md rounded-2xl px-8 py-5 mb-8 border border-white/20">
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl font-bold text-[#ffc95b]">R$ 50</span>
+                  <span className="text-4xl font-bold text-[#FFD700]">R$ 50</span>
                   <span className="text-white/60 text-lg">de reserva</span>
                 </div>
-                <div className="bg-[#25bcc0] text-black font-bold text-sm px-4 py-1.5 rounded-full">
+                <div className="bg-gradient-to-r from-[#C2185B] to-[#BA68C8] text-white font-bold text-sm px-4 py-1.5 rounded-full">
                   ✓ 100% VIRA CONSUMAÇÃO
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function Home() {
               <div className="flex flex-col items-center gap-4">
                 <button
                   onClick={scrollToReserva}
-                  className="bg-gradient-to-r from-[#d71919] to-[#f98f21] hover:from-[#b71515] hover:to-[#d97a1c] text-white font-bold text-lg px-10 py-4 rounded-full transition-all shadow-xl shadow-[#d71919]/40 hover:scale-105"
+                  className="bg-gradient-to-r from-[#C2185B] to-[#FFD700] hover:from-[#a8155a] hover:to-[#e6c200] text-white font-bold text-lg px-10 py-4 rounded-full transition-all shadow-xl shadow-[#C2185B]/40 hover:scale-105"
                 >
                   Fazer Reserva Agora
                 </button>
@@ -99,15 +99,15 @@ export default function Home() {
                 {/* Stats */}
                 <div className="flex flex-wrap justify-center gap-6 mt-6 text-sm text-white/80">
                   <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-                    <Calendar className="w-4 h-4 text-[#ffc95b]" />
+                    <Calendar className="w-4 h-4 text-[#FFD700]" />
                     <span>Até 30/12</span>
                   </div>
                   <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-                    <Users className="w-4 h-4 text-[#25bcc0]" />
+                    <Users className="w-4 h-4 text-[#BA68C8]" />
                     <span>2 a 60 pessoas</span>
                   </div>
                   <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-                    <Clock className="w-4 h-4 text-[#f98f21]" />
+                    <Clock className="w-4 h-4 text-[#C2185B]" />
                     <span>18h às 19h30</span>
                   </div>
                 </div>
@@ -129,13 +129,13 @@ export default function Home() {
         <section className="py-16 px-4 bg-gradient-to-b from-black/80 to-[#1a0505]">
           <div className="container mx-auto max-w-5xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Por que escolher o <span className="text-[#f98f21]">Rosa Mexicano</span>?
+              Por que escolher o <span className="text-[#FFD700]">Rosa Mexicano</span>?
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { title: 'Ambiente Exclusivo', desc: 'Espaço acolhedor para sua confraternização', color: '#d71919', icon: '🎉' },
-                { title: 'Cardápio Especial', desc: 'Pratos autênticos e bebidas selecionadas', color: '#f98f21', icon: '🌮' },
-                { title: 'Garantia de Mesa', desc: 'Valor retorna 100% em consumação', color: '#25bcc0', icon: '✨' },
+                { title: 'Ambiente Exclusivo', desc: 'Espaço acolhedor para sua confraternização', color: '#C2185B', icon: '🎉' },
+                { title: 'Cardápio Especial', desc: 'Pratos autênticos e bebidas selecionadas', color: '#FFD700', icon: '🌮' },
+                { title: 'Garantia de Mesa', desc: 'Valor retorna 100% em consumação', color: '#BA68C8', icon: '✨' },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -166,7 +166,7 @@ export default function Home() {
             >
               <div className="text-center mb-10">
                 <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                  Faça sua <span className="text-[#ffc95b]">Reserva</span>
+                  Faça sua <span className="text-[#FFD700]">Reserva</span>
                 </h2>
                 <p className="text-white/60 text-sm">
                   Preencha os dados abaixo e garanta sua mesa
@@ -174,30 +174,30 @@ export default function Home() {
               </div>
 
               {/* Info Box colorido */}
-              <div className="max-w-3xl mx-auto mb-8 bg-gradient-to-r from-[#d71919]/20 via-[#f98f21]/20 to-[#ffc95b]/20 rounded-2xl p-5 border border-white/10">
+              <div className="max-w-3xl mx-auto mb-8 bg-gradient-to-r from-[#C2185B]/20 via-[#BA68C8]/20 to-[#FFD700]/20 rounded-2xl p-5 border border-white/10">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25bcc0]" />
+                    <Check className="w-4 h-4 text-[#BA68C8]" />
                     <span className="text-white/80">2 a 208 pessoas</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25bcc0]" />
+                    <Check className="w-4 h-4 text-[#BA68C8]" />
                     <span className="text-white/80">Múltiplos de 2</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25bcc0]" />
+                    <Check className="w-4 h-4 text-[#BA68C8]" />
                     <span className="text-white/80">49 mesas por data</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#ffc95b]" />
+                    <Check className="w-4 h-4 text-[#FFD700]" />
                     <span className="text-white/80">208 pessoas/dia</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#ffc95b]" />
+                    <Check className="w-4 h-4 text-[#FFD700]" />
                     <span className="text-white/80">18:00 às 19:30</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#f98f21]" />
+                    <Check className="w-4 h-4 text-[#C2185B]" />
                     <span className="text-white/80">Escolha suas mesas</span>
                   </div>
                 </div>
@@ -212,13 +212,13 @@ export default function Home() {
         <section className="py-16 px-4 bg-gradient-to-b from-[#1a0505] to-[#0f0808]">
           <div className="container mx-auto max-w-3xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
-              Como <span className="text-[#f98f21]">funciona</span>?
+              Como <span className="text-[#FFD700]">funciona</span>?
             </h3>
             <div className="space-y-4">
               {[
-                { step: 1, title: 'Escolha data, horário e pessoas', desc: 'Preencha o formulário acima', color: '#d71919' },
-                { step: 2, title: 'Pague R$ 50,00 via PIX', desc: 'Valor retorna 100% em consumação', color: '#f98f21' },
-                { step: 3, title: 'Receba confirmação', desc: 'Por e-mail e WhatsApp na hora', color: '#25bcc0' },
+                { step: 1, title: 'Escolha data, horário e pessoas', desc: 'Preencha o formulário acima', color: '#C2185B' },
+                { step: 2, title: 'Pague R$ 50,00 via PIX', desc: 'Valor retorna 100% em consumação', color: '#FFD700' },
+                { step: 3, title: 'Receba confirmação', desc: 'Por e-mail e WhatsApp na hora', color: '#BA68C8' },
               ].map((item) => (
                 <motion.div
                   key={item.step}
@@ -248,7 +248,7 @@ export default function Home() {
         <section className="py-16 px-4 bg-[#0f0808]">
           <div className="container mx-auto max-w-5xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
-              Nosso <span className="text-[#ffc95b]">Ambiente</span>
+              Nosso <span className="text-[#FFD700]">Ambiente</span>
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
@@ -273,7 +273,7 @@ export default function Home() {
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#d71919]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#C2185B]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </motion.div>
               ))}
             </div>
@@ -283,17 +283,17 @@ export default function Home() {
         {/* Localização */}
         <section className="py-16 px-4 bg-gradient-to-b from-[#0f0808] to-[#1a0505]">
           <div className="container mx-auto max-w-5xl">
-            <div className="bg-gradient-to-r from-[#d71919]/10 via-[#f98f21]/10 to-[#ffc95b]/10 rounded-2xl p-6 md:p-8 border border-white/10">
+            <div className="bg-gradient-to-r from-[#C2185B]/10 via-[#BA68C8]/10 to-[#FFD700]/10 rounded-2xl p-6 md:p-8 border border-white/10">
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold mb-6">
-                    Visite o <span className="text-[#f98f21]">Rosa Mexicano</span>
+                    Visite o <span className="text-[#FFD700]">Rosa Mexicano</span>
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#d71919]/20 flex items-center justify-center">
-                        <MapPin className="w-5 h-5 text-[#d71919]" />
+                      <div className="w-10 h-10 rounded-full bg-[#C2185B]/20 flex items-center justify-center">
+                        <MapPin className="w-5 h-5 text-[#C2185B]" />
                       </div>
                       <div>
                         <p className="font-medium text-white">Localização</p>
@@ -303,8 +303,8 @@ export default function Home() {
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#25bcc0]/20 flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-[#25bcc0]" />
+                      <div className="w-10 h-10 rounded-full bg-[#BA68C8]/20 flex items-center justify-center">
+                        <Phone className="w-5 h-5 text-[#BA68C8]" />
                       </div>
                       <div>
                         <p className="font-medium text-white">Contato</p>
@@ -324,7 +324,7 @@ export default function Home() {
                       href="https://www.google.com/maps/dir/?api=1&destination=Rua+Carlos+Rischbieter,+64+-+Victor+Konder,+Blumenau+-+SC"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 py-3 rounded-full bg-gradient-to-r from-[#d71919] to-[#f98f21] text-white text-sm font-medium hover:opacity-90 transition-all"
+                      className="px-6 py-3 rounded-full bg-gradient-to-r from-[#C2185B] to-[#FFD700] text-white text-sm font-medium hover:opacity-90 transition-all"
                     >
                       Como Chegar
                     </a>
@@ -361,11 +361,9 @@ export default function Home() {
             <p className="text-white/50 text-sm mb-2">© 2025 Rosa Mexicano Restaurante</p>
             <p className="text-white/30 text-xs">(47) 3288-3096 • Victor Konder, Blumenau/SC</p>
             <div className="flex justify-center gap-2 mt-4">
-              <span className="w-3 h-3 rounded-full bg-[#d71919]"></span>
-              <span className="w-3 h-3 rounded-full bg-[#f98f21]"></span>
-              <span className="w-3 h-3 rounded-full bg-[#ffc95b]"></span>
-              <span className="w-3 h-3 rounded-full bg-[#25bcc0]"></span>
-              <span className="w-3 h-3 rounded-full bg-[#234c91]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#C2185B]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#BA68C8]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#FFD700]"></span>
             </div>
           </div>
         </footer>

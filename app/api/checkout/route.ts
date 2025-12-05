@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         billingType: 'CREDIT_CARD', // Pode ser PIX, BOLETO, CREDIT_CARD
         value: valor,
         dueDate: dataVencimento.toISOString().split('T')[0],
-        description: `Reserva Mortadella - ${data} às ${horario} - ${numeroPessoas} pessoas`,
+        description: `Reserva Rosa Mexicano - ${data} às ${horario} - ${numeroPessoas} pessoas`,
         externalReference: `RESERVA-${Date.now()}`,
         postalService: false,
       }),
