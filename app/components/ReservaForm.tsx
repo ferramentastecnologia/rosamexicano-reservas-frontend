@@ -336,6 +336,19 @@ export default function ReservaForm() {
         {/* Linha 3: Resumo e Botão de Pagamento */}
         <div className="border-t border-white/10 pt-6">
           <div className="bg-gradient-to-r from-[#d71919]/10 via-[#f98f21]/10 to-[#ffc95b]/10 rounded-xl p-5 border border-white/10">
+            {/* Destaque do benefício */}
+            <div className="bg-gradient-to-r from-[#25bcc0]/20 to-[#25bcc0]/5 border border-[#25bcc0]/30 rounded-lg p-3 mb-4 flex items-center gap-3">
+              <div className="bg-[#25bcc0] rounded-full p-2 shrink-0">
+                <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-[#25bcc0] font-bold text-sm">Você não perde nada!</p>
+                <p className="text-white/70 text-xs">Os R$ 50 viram crédito para consumir no restaurante</p>
+              </div>
+            </div>
+
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               {/* Info do valor */}
               <div className="flex items-center gap-4">
@@ -344,8 +357,9 @@ export default function ReservaForm() {
                   <p className="text-3xl font-bold text-[#ffc95b]">R$ 50,00</p>
                 </div>
                 <div className="border-l border-white/10 pl-4">
-                  <p className="text-xs text-[#25bcc0] font-medium">100% conversível</p>
-                  <p className="text-xs text-white/40">em consumação</p>
+                  <div className="bg-[#25bcc0]/20 text-[#25bcc0] text-xs font-bold px-2 py-1 rounded-full inline-block">
+                    100% VIRA CONSUMAÇÃO
+                  </div>
                 </div>
               </div>
 
