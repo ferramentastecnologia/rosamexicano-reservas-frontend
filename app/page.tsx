@@ -242,7 +242,7 @@ export default function Home() {
               {[
                 { step: 1, title: 'Escolha data, horário e pessoas', desc: 'Preencha o formulário acima', color: '#C2185B' },
                 { step: 2, title: 'Pague R$ 50,00 via PIX', desc: 'Valor retorna 100% em consumação', color: '#FFD700' },
-                { step: 3, title: 'Receba confirmação', desc: 'Por e-mail e WhatsApp na hora', color: '#BA68C8' },
+                { step: 3, title: 'Receba confirmação', desc: 'Por e-mail e SMS na hora', color: '#BA68C8' },
               ].map((item) => (
                 <motion.div
                   key={item.step}
