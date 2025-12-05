@@ -136,15 +136,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Linhas decorativas para cortar a foto */}
-        <div className="w-full h-12 bg-black flex items-center justify-center overflow-hidden">
-          <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 60" fill="none">
-            <path d="M0,30 Q300,10 600,30 T1200,30" stroke="#C2185B" strokeWidth="3" opacity="0.8"/>
-            <path d="M0,40 Q300,20 600,40 T1200,40" stroke="#BA68C8" strokeWidth="2" opacity="0.6"/>
-            <path d="M0,50 Q300,35 600,50 T1200,50" stroke="#FFD700" strokeWidth="2" opacity="0.7"/>
-          </svg>
-        </div>
-
         {/* Benefícios com cores - começa com rosa vibrante */}
         <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/25 via-[#BA68C8]/18 to-[#FFD700]/15">
           <div className="container mx-auto max-w-5xl">
