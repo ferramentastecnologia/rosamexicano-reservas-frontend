@@ -137,7 +137,7 @@ export default function Home() {
         </section>
 
         {/* Benefícios com cores */}
-        <section className="py-16 px-4 bg-gradient-to-b from-black via-[#C2185B]/5 to-[#BA68C8]/5">
+        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/20 via-[#BA68C8]/15 to-[#FFD700]/10">
           <div className="container mx-auto max-w-5xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Por que escolher o <span className="text-[#FFD700]">Rosa Mexicano</span>?
@@ -180,7 +180,7 @@ export default function Home() {
         </section>
 
         {/* Formulário de Reserva */}
-        <section id="reserva" className="py-16 px-4 bg-gradient-to-b from-[#BA68C8]/5 via-black to-[#C2185B]/5">
+        <section id="reserva" className="py-16 px-4 bg-gradient-to-b from-[#BA68C8]/15 via-[#C2185B]/10 to-[#FFD700]/15">
           <div className="container mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -233,7 +233,7 @@ export default function Home() {
         </section>
 
         {/* Como Funciona */}
-        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/5 via-black to-[#BA68C8]/5">
+        <section className="py-16 px-4 bg-gradient-to-b from-[#FFD700]/15 via-[#BA68C8]/10 to-[#C2185B]/15">
           <div className="container mx-auto max-w-3xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
               Como <span className="text-[#FFD700]">funciona</span>?
@@ -269,7 +269,7 @@ export default function Home() {
         </section>
 
         {/* Galeria */}
-        <section className="py-16 px-4 bg-gradient-to-b from-[#BA68C8]/5 via-black to-[#C2185B]/5">
+        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/15 via-[#FFD700]/10 to-[#BA68C8]/15">
           <div className="container mx-auto max-w-5xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
               Nosso <span className="text-[#FFD700]">Ambiente</span>
@@ -305,7 +305,7 @@ export default function Home() {
         </section>
 
         {/* Localização */}
-        <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/5 via-black to-[#BA68C8]/5">
+        <section className="py-16 px-4 bg-gradient-to-b from-[#BA68C8]/15 via-[#C2185B]/10 to-[#FFD700]/15">
           <div className="container mx-auto max-w-5xl">
             <div className="shimmer-gradient bg-gradient-to-r from-[#C2185B]/20 via-[#BA68C8]/20 to-[#FFD700]/20 rounded-2xl p-6 md:p-8 border border-white/30 backdrop-blur-sm shadow-lg shadow-[#BA68C8]/15">
               <div className="grid md:grid-cols-2 gap-8">
@@ -373,7 +373,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="py-10 px-4 bg-gradient-to-b from-[#BA68C8]/5 to-black border-t border-white/10">
+        <footer className="py-10 px-4 bg-gradient-to-b from-[#C2185B]/10 to-[#BA68C8]/15 border-t border-white/20">
           <div className="container mx-auto text-center">
             <Image
               src="/images/logo-rosa-mexicano.png"
