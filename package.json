@@ -1,0 +1,22 @@
+{
+  "name": "rosa-mexicano-reservas",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm install && npm run build",
+    "preview": "cd frontend && npm run preview",
+    "lint": "cd frontend && npm run lint"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "description": "Rosa Mexicano - Sistema de Reservas (v2: React + Go Backend)",
+  "keywords": [
+    "reservas",
+    "nextjs",
+    "react",
+    "go",
+    "postgresql"
+  ]
+}
