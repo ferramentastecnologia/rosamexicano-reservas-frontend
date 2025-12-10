@@ -7,6 +7,8 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function Home() {
+  const MAINTENANCE_MODE = true;
+
   const scrollToReserva = () => {
     document.getElementById('reserva')?.scrollIntoView({ behavior: 'smooth' });
   };
