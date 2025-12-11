@@ -32,10 +32,8 @@ body {
   line-height: 1.6;
 }
 
-/* Tailwind */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 */
+@import "tailwindcss";
 
 /* Custom Utilities */
 .glass {
