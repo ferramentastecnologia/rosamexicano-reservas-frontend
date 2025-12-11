@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
   VITE_API_URL = "https://rosamexicano-api.railway.app"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [[redirects]]
   from = "/*"
