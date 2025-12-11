@@ -1,40 +1,152 @@
 import { Link } from 'react-router-dom';
+import { Calendar, Users, Clock, ChevronDown } from 'lucide-react';
 import ReservaForm from '../components/ReservaForm';
 
 export default function Landing() {
-  const MAINTENANCE_MODE = false; // ✅ MODO DE MANUTENÇÃO DESATIVADO - SISTEMA OPERACIONAL
+  const MAINTENANCE_MODE = false;
+
+  const scrollToReserva = () => {
+    const elemento = document.getElementById('reserva');
+    if (elemento) {
+      elemento.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Banner de Manutenção */}
       {MAINTENANCE_MODE && (
-        <div style={{background: 'linear-gradient(to right, var(--rosa-yellow), var(--rosa-orange), var(--rosa-red))'}} className="text-white py-4 px-4 text-center shadow-lg">
+        <div style={{background: 'linear-gradient(to right, #FFD700, #C2185B)'}} className="text-white py-4 px-4 text-center shadow-lg">
           <p className="font-bold text-sm md:text-base">
             🚧 RESERVAS EM MANUTENÇÃO - Temporariamente indisponíveis
           </p>
         </div>
       )}
 
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 md:py-32 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 style={{fontFamily: 'var(--font-playfair)'}} className="text-6xl md:text-7xl font-bold text-gray-900 mb-6">
-            Rosa Mexicano
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-white">Rosa Mexicano</h1>
+        </div>
+        <button
+          onClick={scrollToReserva}
+          className="text-xs text-white bg-[#C2185B] hover:bg-[#a8155a] px-5 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-[#C2185B]/30"
+        >
+          Reservar Mesa
+        </button>
+      </header>
+
+      {/* Hero Section com Imagem de Fundo */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        {/* Imagem de Fundo */}
+        <div className="absolute inset-0 z-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: 'url(/images/banners/rosa-mexicano-principal.jpg)',
+              filter: 'brightness(0.6)'
+            }}
+          />
+          {/* Gradientes coloridos sobre a imagem */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#C2185B]/40 via-[#BA68C8]/20 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#BA68C8]/30 via-transparent to-[#FFD700]/20" />
+        </div>
+
+        {/* Conteúdo do Hero */}
+        <div className="relative z-10 container mx-auto px-4 text-center py-20">
+          {/* Badge colorido */}
+          <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-[#FFD700] to-[#C2185B] text-white text-xs font-bold mb-6 shadow-lg">
+            Final de Ano 2024/2025
+          </div>
+
+          {/* Título com cores */}
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+            <span className="text-white drop-shadow-lg">Celebre com</span>
+            <br />
+            <span className="text-[#FFD700] drop-shadow-lg">Sabor Mexicano</span>
           </h1>
-          <p style={{fontFamily: 'var(--font-open-sans)'}} className="text-2xl md:text-3xl text-gray-700 mb-4 font-light">
-            Celebração de Fim de Ano
+
+          {/* Descrição */}
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            Reserve sua mesa e viva momentos inesquecíveis com a autêntica culinária mexicana
           </p>
-          <p className="text-lg text-gray-500 mb-12">
-            Reservas para 24 a 31 de Dezembro de 2024
-          </p>
-          <div style={{background: 'linear-gradient(135deg, var(--rosa-red), var(--rosa-orange))'}} className="inline-block text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg">
-            R$ 50,00 por pessoa
+
+          {/* Destaque do valor */}
+          <div className="inline-flex flex-col items-center gap-2 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl px-10 py-7 mb-8 border border-white/30 shadow-2xl shadow-[#C2185B]/20">
+            <div className="flex items-center gap-3">
+              <span className="text-5xl font-bold text-[#FFD700]">R$ 50</span>
+              <span className="text-white/70 text-lg">de reserva</span>
+            </div>
+            <div className="bg-gradient-to-r from-[#C2185B] via-[#BA68C8] to-[#FFD700] text-white font-bold text-sm px-6 py-2 rounded-full shadow-lg">
+              ✓ 100% VIRA CONSUMAÇÃO
+            </div>
+          </div>
+
+          {/* Botão CTA */}
+          <div className="flex flex-col items-center gap-4">
+            <button
+              onClick={scrollToReserva}
+              className="relative bg-gradient-to-r from-[#C2185B] to-[#FFD700] text-white font-bold text-lg px-12 py-4 rounded-full transition-all shadow-2xl shadow-[#C2185B]/50 hover:shadow-[#C2185B]/70 border border-white/20 hover:scale-105"
+            >
+              <span className="relative z-10">Fazer Reserva Agora</span>
+            </button>
+
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-6 mt-6 text-sm text-white/80">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Calendar className="w-4 h-4 text-[#FFD700]" />
+                <span>Até 31/12</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Users className="w-4 h-4 text-[#BA68C8]" />
+                <span>2 a 60 pessoas</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4 text-[#C2185B]" />
+                <span>18h às 19h30</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <ChevronDown className="w-8 h-8 text-white/60" />
+          </div>
+        </div>
+      </section>
+
+      {/* Benefícios */}
+      <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/25 via-[#BA68C8]/18 to-[#FFD700]/15">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Por que escolher o <span className="text-[#FFD700]">Rosa Mexicano</span>?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: 'Ambiente Exclusivo', desc: 'Espaço acolhedor para sua confraternização', color: '#C2185B', icon: '🎉' },
+              { title: 'Cardápio Especial', desc: 'Pratos autênticos e bebidas selecionadas', color: '#FFD700', icon: '🌮' },
+              { title: 'Garantia de Mesa', desc: 'Valor retorna 100% em consumação', color: '#BA68C8', icon: '✨' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-lg rounded-2xl p-7 text-center border border-white/30 hover:border-white/50 transition-all hover:shadow-2xl hover:-translate-y-2"
+                style={{ borderTopColor: item.color, borderTopWidth: '4px' }}
+              >
+                <div className="text-5xl mb-4">{item.icon}</div>
+                <h4 className="text-lg font-bold mb-2" style={{ color: item.color }}>{item.title}</h4>
+                <p className="text-white/70 text-sm">{item.desc}</p>
+                <div
+                  className="absolute top-0 right-0 w-20 h-20 rounded-full blur-2xl -z-10"
+                  style={{ background: `${item.color}30` }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Formulário de Reserva */}
-      <section className="py-20 px-4 bg-white">
+      <section id="reserva" className="py-16 px-4 bg-gradient-to-b from-[#FFD700]/15 via-[#C2185B]/18 to-[#BA68C8]/20">
         {MAINTENANCE_MODE ? (
           // Mensagem de Manutenção
           <div className="max-w-4xl mx-auto bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg shadow-lg p-12 text-center border-2 border-orange-500/50">
