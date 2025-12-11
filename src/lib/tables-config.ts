@@ -1,4 +1,6 @@
-import { TableArea, TableConfig } from '../types';
+import { TableConfig } from '../types';
+
+export type TableArea = 'interno' | 'semi-externo' | 'externo';
 
 // Mesas que NÃO existem
 const MESAS_INEXISTENTES = [9, 13, 15];

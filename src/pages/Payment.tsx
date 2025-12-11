@@ -7,7 +7,7 @@ export default function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
   const paymentData = location.state?.paymentData;
-  const { status, isPolling, error } = usePaymentPolling(paymentData?.payment_id);
+  const { status, error } = usePaymentPolling(paymentData?.payment_id);
 
   useEffect(() => {
     if (!paymentData) {

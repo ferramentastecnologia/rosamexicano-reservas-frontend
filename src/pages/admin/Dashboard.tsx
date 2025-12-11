@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
-import { BarChart3, Users, Calendar, DollarSign, LogOut } from 'lucide-react';
+import { BarChart3, Users, Calendar, DollarSign, LogOut, Clock } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();

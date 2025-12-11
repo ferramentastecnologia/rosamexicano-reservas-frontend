@@ -93,7 +93,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
   };
 
   const handleDateClick = (day: any) => {
-    if (day && day.isAvailable) {
+    if (day?.isAvailable) {
       const dateStr = day.fullDate.toISOString().split('T')[0];
       onSelectDate(dateStr);
     }
