@@ -106,7 +106,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
   }
 
   return (
-    <div className="bg-black/30 rounded-xl border border-white/5 p-4">
+    <div className="bg-black/30 rounded-xl border border-white/5 p-4 max-w-md mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button

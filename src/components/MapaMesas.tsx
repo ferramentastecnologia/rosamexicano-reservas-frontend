@@ -156,7 +156,7 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
   }
 
   return (
-    <div className="bg-black/20 rounded-xl p-4 md:p-6 border border-white/5">
+    <div className="bg-black/20 rounded-xl p-4 md:p-6 border border-white/5 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-sm font-medium flex items-center gap-2 text-white/90">
           <Users className="w-4 h-4 text-[#f98f21]" />
@@ -192,18 +192,21 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
 
       {/* Grid de Mesas */}
       {loading ? (
-        <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded-lg bg-white/5 animate-pulse" />
-          ))}
+        <div className="flex justify-center">
+          <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div key={i} className="aspect-square rounded-lg bg-white/5 animate-pulse" />
+            ))}
+          </div>
         </div>
       ) : tables.length > 0 ? (
         <>
           <div className="mb-3 text-xs text-white/40">
             {tables.filter(t => t.available).length} mesas disponíveis • Clique para selecionar
           </div>
-          <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
-            {tables.map(table => {
+          <div className="flex justify-center">
+            <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
+              {tables.map(table => {
               const isSelected = selectedTables.includes(table.number);
               const isAvailable = table.available;
 
@@ -236,6 +239,7 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
                 </button>
               );
             })}
+            </div>
           </div>
 
           {/* Legenda */}

@@ -137,7 +137,7 @@ export default function ReservaForm() {
   const errorClasses = "text-[#d71919] text-xs mt-1";
 
   return (
-    <div className="glass-strong rounded-2xl p-6 md:p-8 w-full">
+    <div className="glass-strong rounded-2xl p-6 md:p-8 max-w-6xl mx-auto">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full">
         {/* Linha 1: Dados Pessoais | Data e Horário */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
@@ -306,7 +306,7 @@ export default function ReservaForm() {
             <MapPin className="w-4 h-4 text-[#f98f21]" />
             Área do Restaurante
           </h4>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {(['interno', 'semi-externo', 'externo'] as TableArea[]).map((area) => (
               <button
                 key={area}

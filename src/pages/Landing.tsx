@@ -190,7 +190,7 @@ export default function Landing() {
 
       {/* Detalhes */}
       <section className="py-16 px-4 bg-black/50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-white">Benefícios da Reserva</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="glass-strong rounded-2xl p-8 text-center border border-white/10">
@@ -214,7 +214,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="bg-black border-t border-white/10 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <h3 className="text-2xl font-bold mb-4 text-[#ffc95b]">Rosa Mexicano</h3>
             <p className="text-white/70">
@@ -233,7 +233,7 @@ export default function Landing() {
             </p>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto border-t border-white/10 mt-8 pt-8 text-center text-white/50">
+        <div className="max-w-6xl mx-auto border-t border-white/10 mt-8 pt-8 text-center text-white/50">
           <p>&copy; 2024 Rosa Mexicano. Todos os direitos reservados.</p>
         </div>
       </footer>
