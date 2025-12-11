@@ -26,7 +26,12 @@ export default function Landing() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 bg-black/80 backdrop-blur-md border-b border-white/10">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-white">Rosa Mexicano</h1>
+          <img
+            src="/images/logo-rosa-mexicano.png"
+            alt="Rosa Mexicano"
+            className="h-12 md:h-16 w-auto drop-shadow-lg"
+          />
+          <h1 className="text-2xl font-bold text-white hidden sm:block">Rosa Mexicano</h1>
         </div>
         <button
           onClick={scrollToReserva}
@@ -145,6 +150,40 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Galeria de Fotos */}
+      <section className="py-16 px-4 bg-gradient-to-b from-[#C2185B]/18 via-[#BA68C8]/15 to-[#FFD700]/18">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
+            Nosso <span className="text-[#FFD700]">Ambiente</span>
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { src: '/images/ambiente/bnu01.jpg', alt: 'Ambiente Rosa Mexicano 1' },
+              { src: '/images/ambiente/bnu02.jpg', alt: 'Ambiente Rosa Mexicano 2' },
+              { src: '/images/ambiente/bnu03.jpg', alt: 'Ambiente Rosa Mexicano 3' },
+              { src: '/images/ambiente/bnu04.jpg', alt: 'Ambiente Rosa Mexicano 4' },
+              { src: '/images/ambiente/bnu05.jpg', alt: 'Ambiente Rosa Mexicano 5' },
+              { src: '/images/ambiente/a3b363b686c06baa2308326374f9406b.jpg', alt: 'Ambiente Rosa Mexicano 6' },
+            ].map((image, i) => (
+              <div
+                key={i}
+                className="relative aspect-[3/2] rounded-xl overflow-hidden group cursor-pointer"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                {/* Overlay no hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#C2185B]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Formulário de Reserva */}
       <section id="reserva" className="py-16 bg-gradient-to-b from-[#FFD700]/15 via-[#C2185B]/18 to-[#BA68C8]/20">
         {MAINTENANCE_MODE ? (
@@ -216,6 +255,11 @@ export default function Landing() {
       <footer className="bg-black border-t border-white/10 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
+            <img
+              src="/images/logo-rosa-mexicano.png"
+              alt="Rosa Mexicano"
+              className="h-16 w-auto mb-4 drop-shadow-lg"
+            />
             <h3 className="text-2xl font-bold mb-4 text-[#ffc95b]">Rosa Mexicano</h3>
             <p className="text-white/70">
               O melhor lugar para celebrar o seu fim de ano com estilo, música e boa comida.
