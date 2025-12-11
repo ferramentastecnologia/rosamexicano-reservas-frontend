@@ -50,7 +50,8 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
     try {
       const response = await paymentAPI.getAvailableTables({
         data,
-        area: selectedArea,
+        horario,
+        numero_pessoas: numeroPessoas,
       });
 
       const result = response.data;
@@ -71,7 +72,7 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
     } finally {
       setLoading(false);
     }
-  }, [data, selectedArea]);
+  }, [data, horario, numeroPessoas, selectedArea]);
 
   useEffect(() => {
     if (data && selectedArea) {
