@@ -139,7 +139,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
         <div className="grid grid-cols-7 gap-2">
           {days.map((day, index) => {
             const isSelected = day && selectedDate === day.fullDate.toISOString().split('T')[0];
-            const isClosed = day && !day.isAvailable;
+            const isClosed = day ? !day.isAvailable : false;
             const isCurrentDate = isTodayMonth && day && day.date === today?.getDate();
 
             return (
