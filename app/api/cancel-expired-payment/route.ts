@@ -4,6 +4,18 @@ import { prisma } from '@/lib/prisma';
 const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
 const ASAAS_API_URL = process.env.ASAAS_API_URL || 'https://api.asaas.com/v3';
 
+// Função auxiliar para expirar vouchers quando a reserva é cancelada
+async function expireVouchers(reservationId: string) {
+  try {
+    await prisma.voucher.updateMany({
+      where: { reservationId },
+      data: { dataValidade: new Date(Date.now() - 1000) } // Set to past time
+    });
+  } catch (error) {
+    console.error(`Erro ao expirar vouchers da reserva ${reservationId}:`, error);
+  }
+}
+
 // Cancelar cobrança no Asaas
 async function cancelPaymentInAsaas(paymentId: string): Promise<boolean> {
   try {
@@ -104,11 +116,42 @@ async function getPaymentStatusFromAsaas(paymentId: string): Promise<string | nu
   }
 }
 
-// GET: Limpar todas as reservas pendentes com mais de 10 minutos
+// GET: Limpar reservas expiradas por pagamento (10 min) e por horário (10 min após hora agendada)
 export async function GET() {
   try {
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+    const now = new Date();
+    const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
 
+    // 1. CANCELAR RESERVAS COM HORÁRIO EXPIRADO (10 minutos após hora agendada)
+    // Buscar reservas confirmadas/aprovadas que passaram 10 minutos do horário agendado
+    const expiredByTimeReservations = await prisma.reservation.findMany({
+      where: {
+        status: {
+          in: ['confirmed', 'approved']
+        }
+      }
+    });
+
+    let expiredByTime = 0;
+    for (const reservation of expiredByTimeReservations) {
+      // Comparar data e hora
+      const reservationTime = new Date(`${reservation.data}T${reservation.horario}`);
+      const expirationTime = new Date(reservationTime.getTime() + 10 * 60 * 1000); // +10 minutos
+
+      if (now > expirationTime) {
+        console.log(`⏰ Reserva ${reservation.id} expirou (horário: ${reservation.data} ${reservation.horario}). Cancelando...`);
+        await prisma.reservation.update({
+          where: { id: reservation.id },
+          data: { status: 'cancelled' }
+        });
+        // Expirar vouchers também
+        await expireVouchers(reservation.id);
+        expiredByTime++;
+      }
+    }
+
+    // 2. CANCELAR RESERVAS COM PAGAMENTO EXPIRADO (10 minutos após criação)
     // Buscar reservas pendentes antigas
     const oldPendingReservations = await prisma.reservation.findMany({
       where: {
@@ -120,6 +163,7 @@ export async function GET() {
     });
 
     console.log(`Encontradas ${oldPendingReservations.length} reservas pendentes para validar`);
+    console.log(`Encontradas ${expiredByTime} reservas com horário expirado para cancelar`);
 
     let cancelled = 0;
     let confirmed = 0;
@@ -173,10 +217,15 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      message: `Processadas ${oldPendingReservations.length} reservas: ${confirmed} confirmadas, ${cancelled} canceladas`,
-      total: oldPendingReservations.length,
-      confirmed,
-      cancelled
+      message: `Processadas ${oldPendingReservations.length} reservas por pagamento e ${expiredByTime} por horário`,
+      paymentExpired: {
+        total: oldPendingReservations.length,
+        confirmed,
+        cancelled
+      },
+      timeExpired: {
+        total: expiredByTime
+      }
     });
 
   } catch (error) {
