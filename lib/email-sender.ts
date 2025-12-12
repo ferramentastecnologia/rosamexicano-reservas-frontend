@@ -33,7 +33,7 @@ export async function sendApprovalEmail(reservation: any): Promise<boolean> {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header { background: #E53935; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
             .details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
             .detail-row { padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -105,7 +105,7 @@ export async function sendRejectionEmail(reservation: any): Promise<boolean> {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #666 0%, #333 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header { background: #666; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
             .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
           </style>
@@ -169,7 +169,7 @@ export async function sendVoucherEmail(
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .header { background: #E53935; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
             .voucher-code { background: #fff; padding: 20px; border-left: 4px solid #E53935; margin: 20px 0; font-size: 24px; font-weight: bold; text-align: center; color: #E53935; font-family: 'Courier New', monospace; }
             .details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }

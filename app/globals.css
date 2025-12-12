@@ -45,7 +45,7 @@ body {
 }
 
 .glass-strong {
-  background: linear-gradient(135deg, rgba(215, 25, 25, 0.08) 0%, rgba(249, 143, 33, 0.05) 50%, rgba(255, 201, 91, 0.03) 100%);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -55,17 +55,16 @@ body {
 .card-mexican {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-image: linear-gradient(135deg, var(--rosa-red), var(--rosa-orange), var(--rosa-yellow)) 1;
 }
 
 /* Botão com gradiente mexicano */
 .btn-mexican {
-  background: linear-gradient(135deg, var(--rosa-red) 0%, var(--rosa-orange) 100%);
+  background: var(--rosa-red);
   transition: all 0.3s ease;
 }
 
 .btn-mexican:hover {
-  background: linear-gradient(135deg, var(--rosa-red-dark) 0%, var(--rosa-red) 100%);
+  background: var(--rosa-red-dark);
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(215, 25, 25, 0.3);
 }
@@ -86,20 +85,6 @@ body {
   }
 }
 
-/* Animação de brilho dinâmico */
-@keyframes shimmer {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.shimmer-gradient {
-  background-size: 200% 200%;
-  animation: shimmer 8s ease-in-out infinite;
-}
 
 * {
   box-sizing: border-box;
