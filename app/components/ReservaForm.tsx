@@ -335,7 +335,7 @@ export default function ReservaForm() {
 
         {/* Linha 3: Resumo e Botão de Pagamento */}
         <div className="border-t border-white/10 pt-6">
-          <div className="bg-gradient-to-r from-[#d71919]/10 via-[#f98f21]/10 to-[#ffc95b]/10 rounded-xl p-5 border border-white/10">
+          <div className="bg-black/40 rounded-xl p-5 border border-white/10">
             {/* Destaque do benefício */}
             <div className="bg-gradient-to-r from-[#25bcc0]/20 to-[#25bcc0]/5 border border-[#25bcc0]/30 rounded-lg p-3 mb-4 flex items-center gap-3">
               <div className="bg-[#25bcc0] rounded-full p-2 shrink-0">

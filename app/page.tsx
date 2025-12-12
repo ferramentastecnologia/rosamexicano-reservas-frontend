@@ -209,7 +209,7 @@ export default function Home() {
               </div>
 
               {/* Info Box colorido */}
-              <div className="max-w-3xl mx-auto mb-8 bg-black/60 rounded-2xl p-6 border border-white/20 shadow-lg shadow-[#C2185B]/10">
+              <div className="max-w-3xl mx-auto mb-8 shimmer-gradient bg-gradient-to-r from-[#C2185B]/25 via-[#BA68C8]/25 to-[#FFD700]/25 rounded-2xl p-6 border border-white/30 backdrop-blur-sm shadow-lg shadow-[#C2185B]/15">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#BA68C8]" />
