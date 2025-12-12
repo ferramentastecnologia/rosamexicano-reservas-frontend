@@ -48,6 +48,9 @@ type VoucherData = {
   };
 };
 
+type SortColumn = 'createdAt' | 'dataValidade' | null;
+type SortDirection = 'asc' | 'desc';
+
 export default function VouchersPage() {
   const router = useRouter();
   const [vouchers, setVouchers] = useState<VoucherData[]>([]);
@@ -58,6 +61,8 @@ export default function VouchersPage() {
   const [selectedVoucher, setSelectedVoucher] = useState<VoucherData | null>(null);
   const [validating, setValidating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [sortColumn, setSortColumn] = useState<SortColumn>('createdAt'); // Padrão: por data de criação
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc'); // Mais recentes primeiro
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -70,7 +75,8 @@ export default function VouchersPage() {
 
   useEffect(() => {
     filterVouchers();
-  }, [searchTerm, statusFilter, vouchers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, statusFilter, vouchers, sortColumn, sortDirection]);
 
   const loadVouchers = async () => {
     try {
@@ -107,6 +113,26 @@ export default function VouchersPage() {
         v.reservation?.telefone?.includes(term) ||
         v.reservation?.nome?.toLowerCase().includes(term)
       );
+    }
+
+    // Ordenação
+    if (sortColumn) {
+      filtered.sort((a, b) => {
+        let aValue: any = '';
+        let bValue: any = '';
+
+        if (sortColumn === 'createdAt') {
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+        } else if (sortColumn === 'dataValidade') {
+          aValue = new Date(a.dataValidade).getTime();
+          bValue = new Date(b.dataValidade).getTime();
+        }
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
     }
 
     setFilteredVouchers(filtered);
