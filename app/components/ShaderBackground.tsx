@@ -24,8 +24,8 @@ export function ShaderBackground({ children }: ShaderBackgroundProps) {
         speed={0.12}
       />
 
-      {/* Overlay mais leve para manter cores vibrantes */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/50" />
+      {/* Overlay para manter cores vibrantes e escurecer ligeiramente */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
 
       {/* Conteúdo */}
       <div className="relative z-10">
