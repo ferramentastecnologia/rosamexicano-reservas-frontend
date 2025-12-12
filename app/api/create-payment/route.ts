@@ -74,21 +74,25 @@ export async function POST(request: Request) {
     // 2. Criar referência externa única
     const externalRef = `RESERVA-${Date.now()}`;
 
-    // 3. Criar cobrança no Asaas
+    // 3. Gerar PIX sem criar cobrança no Asaas (evita SMS automático)
+    // Vamos usar a Chave PIX estática ou gerar dinamicamente sem criar payment
+    console.log('Gerando PIX dinâmico via Asaas...');
+
+    // Para manter compatibilidade, vamos criar um payment com notificação desativada
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 3);
 
-    console.log('Criando cobrança no Asaas...');
     const paymentData = {
       customer: customer.id,
-      billingType: 'PIX', // Apenas PIX disponível
+      billingType: 'PIX',
       value: 50.00,
       dueDate: dueDate.toISOString().split('T')[0],
       description: `Reserva Rosa Mexicano - ${dataReserva} às ${horario} - ${numeroPessoas} pessoas`,
       externalReference: externalRef,
       postalService: false,
+      notificationDisabled: true, // DESATIVA NOTIFICAÇÕES (SMS, EMAIL) DO ASAAS
     };
-    console.log('Dados do pagamento:', paymentData);
+    console.log('Criando pagamento com notificações desativadas...');
 
     const paymentResponse = await fetch(`${ASAAS_API_URL}/payments`, {
       method: 'POST',
@@ -104,8 +108,8 @@ export async function POST(request: Request) {
     console.log('Status:', paymentResponse.status);
 
     if (!paymentResponse.ok) {
-      console.error('Erro ao criar cobrança:', payment);
-      const errorMsg = payment.errors?.[0]?.description || payment.message || 'Erro ao criar cobrança';
+      console.error('Erro ao criar pagamento:', payment);
+      const errorMsg = payment.errors?.[0]?.description || payment.message || 'Erro ao criar pagamento';
       return NextResponse.json(
         { success: false, error: errorMsg },
         { status: 500 }
