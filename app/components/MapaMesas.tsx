@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Check, X, Users } from 'lucide-react';
-import { TableArea, AREA_NAMES } from '@/lib/tables-config';
+import { TableArea, AREA_NAMES, canTablesBeJoined, canTableBeCombined } from '@/lib/tables-config';
 
 type Mesa = {
   number: number;
@@ -99,6 +99,12 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
     const table = tables.find(t => t.number === tableNumber);
     if (!table || !table.available) return;
 
+    // Validar se a mesa pode ser combinada
+    if (!canTableBeCombined(tableNumber)) {
+      alert(`A mesa ${tableNumber} não pode ser combinada com outras mesas.`);
+      return;
+    }
+
     const mesasNecessarias = Math.ceil(numeroPessoas / 4);
 
     setSelectedTables(prev => {
@@ -110,6 +116,14 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
         return newSelection;
       } else {
         if (prev.length < mesasNecessarias) {
+          // Validar se pode combinar com as mesas já selecionadas
+          for (const selectedTable of prev) {
+            if (!canTablesBeJoined(tableNumber, selectedTable)) {
+              alert(`A mesa ${tableNumber} não pode ser combinada com a mesa ${selectedTable}.`);
+              return prev;
+            }
+          }
+
           const newSelection = [...prev, tableNumber].sort((a, b) => a - b);
           onMesasSelect(newSelection);
           return newSelection;
