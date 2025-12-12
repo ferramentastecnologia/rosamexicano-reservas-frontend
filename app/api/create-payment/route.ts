@@ -31,12 +31,12 @@ export async function POST(request: Request) {
 
     console.log('✅ Gateway de pagamento Asaas configurado com sucesso');
 
-    // 1. Criar cliente no Asaas
-    const cleanPhone = telefone.replace(/\D/g, '');
+    // 1. Criar cliente GENÉRICO no Asaas (sem dados reais)
+    // Os dados reais do cliente são salvos no banco - Asaas só recebe dados dummy
+    console.log('Criando cliente genérico no Asaas (sem notificações)...');
 
-    console.log('Criando cliente no Asaas...');
-    console.log('URL:', `${ASAAS_API_URL}/customers`);
-    console.log('Dados:', { name: nome, email, mobilePhone: cleanPhone });
+    const genericEmail = 'reservarosamexicano@gmail.com'; // Email genérico
+    const genericPhone = '11111111111'; // Telefone dummy
 
     const customerResponse = await fetch(`${ASAAS_API_URL}/customers`, {
       method: 'POST',
@@ -45,11 +45,11 @@ export async function POST(request: Request) {
         'access_token': ASAAS_API_KEY,
       },
       body: JSON.stringify({
-        name: nome,
-        email: email,
-        mobilePhone: cleanPhone,
-        cpfCnpj: '00000000000191', // CPF padrão quando não fornecido
-        notificationDisabled: true, // DESATIVA TODAS AS NOTIFICAÇÕES AUTOMÁTICAS DO ASAAS
+        name: 'Rosa Mexicano - Pagamento PIX',
+        email: genericEmail, // Email genérico - Asaas não envia notificação
+        mobilePhone: genericPhone, // Telefone dummy
+        cpfCnpj: '00000000000191',
+        notificationDisabled: true, // DESATIVA NOTIFICAÇÕES DO ASAAS
       }),
     });
 
