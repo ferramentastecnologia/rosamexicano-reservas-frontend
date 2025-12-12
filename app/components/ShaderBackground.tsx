@@ -25,7 +25,7 @@ export function ShaderBackground({ children }: ShaderBackgroundProps) {
       />
 
       {/* Overlay para manter cores vibrantes e escurecer ligeiramente */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
+      <div className="absolute inset-0 bg-black/45" />
 
       {/* Conteúdo */}
       <div className="relative z-10">
