@@ -49,7 +49,7 @@ type Reservation = {
   voucher?: Voucher | null;
 };
 
-type SortColumn = 'data' | 'horario' | 'nome' | 'valor' | 'status' | 'createdAt' | null;
+type SortColumn = 'dataHora' | 'nome' | 'valor' | 'status' | 'createdAt' | null;
 type SortDirection = 'asc' | 'desc';
 
 export default function AdminReservations() {
@@ -117,11 +117,14 @@ export default function AdminReservations() {
         let bValue: any = '';
 
         switch (sortColumn) {
-          case 'data':
-            aValue = new Date(a.data).getTime();
-            bValue = new Date(b.data).getTime();
-            break;
-          case 'horario':
+          case 'dataHora':
+            // Ordena por data primeiro, depois por hora
+            const aDate = new Date(a.data).getTime();
+            const bDate = new Date(b.data).getTime();
+            if (aDate !== bDate) {
+              return sortDirection === 'asc' ? aDate - bDate : bDate - aDate;
+            }
+            // Se mesma data, ordena por hora
             aValue = a.horario;
             bValue = b.horario;
             break;
@@ -143,8 +146,10 @@ export default function AdminReservations() {
             break;
         }
 
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        if (sortColumn !== 'dataHora') {
+          if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+          if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        }
         return 0;
       });
     }
@@ -350,21 +355,11 @@ export default function AdminReservations() {
                     >
                       Cliente {renderSortIcon('nome')}
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleSort('data')}
-                          className="cursor-pointer hover:text-white transition"
-                        >
-                          Data {renderSortIcon('data')}
-                        </button>
-                        <button
-                          onClick={() => handleSort('horario')}
-                          className="cursor-pointer hover:text-white transition"
-                        >
-                          Hora {renderSortIcon('horario')}
-                        </button>
-                      </div>
+                    <th
+                      onClick={() => handleSort('dataHora')}
+                      className="px-4 py-3 text-left text-xs font-medium text-zinc-400 cursor-pointer hover:text-white transition"
+                    >
+                      Data/Hora {renderSortIcon('dataHora')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">Pessoas</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">Mesas</th>
