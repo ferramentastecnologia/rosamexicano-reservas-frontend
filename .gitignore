@@ -1,0 +1,36 @@
+# Variáveis de ambiente - NUNCA COMMITAR
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Next.js
+.next/
+out/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/dev.db
+
+# Logs
+logs/
+*.log
+
+# Build
+.turbo/
+coverage/
