@@ -60,17 +60,18 @@ export default function ReservaForm() {
   };
 
   const onSubmit = async (data: ReservaFormData) => {
-    const mesasNecessarias = Math.ceil(data.numeroPessoas / 4);
-
-    // Validar quantidade MÍNIMA de mesas (não máxima exata)
-    if (selectedTables.length < mesasNecessarias) {
-      alert(`Por favor, selecione pelo menos ${mesasNecessarias} mesa(s) para ${data.numeroPessoas} pessoas.`);
-      return;
-    }
-
     // Validar se há mesas selecionadas
     if (selectedTables.length === 0) {
       alert('Por favor, selecione pelo menos uma mesa.');
+      return;
+    }
+
+    // Calcular capacidade total das mesas selecionadas
+    // (será feito na API também para segurança)
+    const mesasNecessarias = Math.ceil(data.numeroPessoas / 4);
+
+    if (selectedTables.length < mesasNecessarias) {
+      alert(`Por favor, selecione pelo menos ${mesasNecessarias} mesa(s) para ${data.numeroPessoas} pessoas.`);
       return;
     }
 
