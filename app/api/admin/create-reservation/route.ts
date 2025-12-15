@@ -11,7 +11,6 @@ export async function POST(request: Request) {
       data,
       horario,
       numeroPessoas,
-      mesasSelecionadas,
       observacoes,
       status
     } = body;
@@ -38,7 +37,6 @@ export async function POST(request: Request) {
         data: data,
         horario: horario,
         numeroPessoas: parseInt(numeroPessoas),
-        mesasSelecionadas: mesasSelecionadas || null,
         valor: 0, // Reserva manual sem cobrança
         status: status || 'confirmed', // Manual já vem confirmada
         observacoes: observacoes || '',
@@ -49,7 +47,6 @@ export async function POST(request: Request) {
     console.log(`   Cliente: ${reservation.nome}`);
     console.log(`   Data: ${reservation.data} às ${reservation.horario}`);
     console.log(`   Pessoas: ${reservation.numeroPessoas}`);
-    console.log(`   Mesas: ${reservation.mesasSelecionadas}`);
 
     return NextResponse.json({
       success: true,

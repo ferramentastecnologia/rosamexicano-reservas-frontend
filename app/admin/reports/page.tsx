@@ -35,7 +35,6 @@ type ReservaDetalhe = {
   numeroPessoas: number;
   valor: number;
   status: string;
-  mesasSelecionadas: string | null;
   voucher: { codigo: string; utilizado: boolean } | null;
 };
 
@@ -132,14 +131,13 @@ export default function AdminReports() {
     // Se for relatório diário com lista de reservas
     if (data.listaReservas && data.listaReservas.length > 0) {
       csvContent += 'RESERVAS\n';
-      csvContent += 'Horário;Cliente;Telefone;Email;Pessoas;Mesa;Valor;Status;Voucher\n';
+      csvContent += 'Horário;Cliente;Telefone;Email;Pessoas;Valor;Status;Voucher\n';
 
       data.listaReservas
         .sort((a, b) => a.horario.localeCompare(b.horario))
         .forEach(r => {
-          const mesa = r.mesasSelecionadas ? JSON.parse(r.mesasSelecionadas).join(', ') : '-';
           const voucher = r.voucher ? r.voucher.codigo : '-';
-          csvContent += `${r.horario};${r.nome};${r.telefone};${r.email};${r.numeroPessoas};${mesa};${r.valor.toFixed(2)};${getStatusLabel(r.status)};${voucher}\n`;
+          csvContent += `${r.horario};${r.nome};${r.telefone};${r.email};${r.numeroPessoas};${r.valor.toFixed(2)};${getStatusLabel(r.status)};${voucher}\n`;
         });
 
       csvContent += '\n';
@@ -605,7 +603,6 @@ export default function AdminReports() {
                         <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Cliente</th>
                         <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Telefone</th>
                         <th className="px-3 py-2 text-center text-zinc-400 print:text-black print:px-1 print:py-1">Pax</th>
-                        <th className="px-3 py-2 text-left text-zinc-400 print:text-black print:px-1 print:py-1">Mesa</th>
                         <th className="px-3 py-2 text-right text-zinc-400 print:text-black print:px-1 print:py-1">Valor</th>
                         <th className="px-3 py-2 text-center text-zinc-400 print:text-black print:px-1 print:py-1">Status</th>
                       </tr>
@@ -619,11 +616,6 @@ export default function AdminReports() {
                             <td className="px-3 py-2 print:px-1 print:py-1 print:max-w-[120px] print:truncate">{reserva.nome}</td>
                             <td className="px-3 py-2 print:px-1 print:py-1">{reserva.telefone}</td>
                             <td className="px-3 py-2 text-center print:px-1 print:py-1">{reserva.numeroPessoas}</td>
-                            <td className="px-3 py-2 print:px-1 print:py-1">
-                              {reserva.mesasSelecionadas
-                                ? JSON.parse(reserva.mesasSelecionadas).join(', ')
-                                : '-'}
-                            </td>
                             <td className="px-3 py-2 text-right font-medium print:px-1 print:py-1">{formatCurrency(reserva.valor)}</td>
                             <td className={`px-3 py-2 text-center font-medium ${getStatusColor(reserva.status)} print:text-black print:px-1 print:py-1`}>
                               {getStatusLabel(reserva.status)}

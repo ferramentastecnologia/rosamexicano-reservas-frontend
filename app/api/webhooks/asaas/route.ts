@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
       console.log(`   Cliente: ${updatedReservation.nome}`);
       console.log(`   Data: ${updatedReservation.data} às ${updatedReservation.horario}`);
       console.log(`   Pessoas: ${updatedReservation.numeroPessoas}`);
-      console.log(`   Mesas: ${updatedReservation.mesasSelecionadas}`);
 
       return NextResponse.json({
         success: true,

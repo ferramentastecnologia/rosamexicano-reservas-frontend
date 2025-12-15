@@ -42,7 +42,6 @@ type Reservation = {
   data: string;
   horario: string;
   numeroPessoas: number;
-  mesasSelecionadas: string | null;
   valor: number;
   status: string;
   createdAt: string;
@@ -354,7 +353,6 @@ export default function AdminReservations() {
                       Data/Hora {renderSortIcon('dataHora')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">Pessoas</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">Mesas</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">Valor</th>
                     <th
                       onClick={() => handleSort('status')}
@@ -367,10 +365,6 @@ export default function AdminReservations() {
                 </thead>
                 <tbody className="divide-y divide-zinc-800">
                   {filteredReservations.map((reservation) => {
-                    const mesas = reservation.mesasSelecionadas
-                      ? JSON.parse(reservation.mesasSelecionadas).join(', ')
-                      : '-';
-
                     return (
                       <tr key={reservation.id} className="hover:bg-zinc-800/50">
                         <td className="px-4 py-3 text-sm font-mono">{reservation.externalRef}</td>
@@ -387,7 +381,6 @@ export default function AdminReservations() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm">{reservation.numeroPessoas}</td>
-                        <td className="px-4 py-3 text-sm">{mesas}</td>
                         <td className="px-4 py-3 text-sm font-medium text-[#E53935]">R$ {reservation.valor.toFixed(2)}</td>
                         <td className="px-4 py-3">{getStatusBadge(reservation.status)}</td>
                         <td className="px-4 py-3">
@@ -495,14 +488,6 @@ export default function AdminReservations() {
                     <div>
                       <label className="text-sm text-zinc-400">Número de Pessoas</label>
                       <p className="font-medium">{selectedReservation.numeroPessoas}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-zinc-400">Mesas Selecionadas</label>
-                      <p className="font-medium">
-                        {selectedReservation.mesasSelecionadas
-                          ? JSON.parse(selectedReservation.mesasSelecionadas).join(', ')
-                          : '-'}
-                      </p>
                     </div>
                     <div>
                       <label className="text-sm text-zinc-400">Valor</label>

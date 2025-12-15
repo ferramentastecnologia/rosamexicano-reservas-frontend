@@ -201,7 +201,6 @@ export async function GET(request: Request) {
         numeroPessoas: r.numeroPessoas,
         valor: r.valor,
         status: r.status,
-        mesasSelecionadas: r.mesasSelecionadas,
         voucher: r.voucher ? {
           codigo: r.voucher.codigo,
           utilizado: r.voucher.utilizado,
