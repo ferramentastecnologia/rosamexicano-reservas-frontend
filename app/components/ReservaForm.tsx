@@ -133,18 +133,18 @@ export default function ReservaForm() {
     }
   };
 
-  const inputClasses = "w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-[#f98f21] text-white placeholder:text-white/30 transition-colors";
-  const labelClasses = "block text-sm font-light text-white/70 mb-2";
-  const errorClasses = "text-[#d71919] text-xs mt-1";
+  const inputClasses = "w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:border-[#f98f21] focus:bg-white/10 text-white placeholder:text-white/50 transition-all";
+  const labelClasses = "block text-sm font-medium text-white/90 mb-2";
+  const errorClasses = "text-[#d71919] text-xs mt-1 font-medium";
 
   return (
-    <div className="glass-strong rounded-2xl p-6 md:p-8">
+    <div className="bg-white/[0.08] backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Linha 1: Dados Pessoais | Data e Horário */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
           {/* Coluna 1: Dados Pessoais */}
           <div className="space-y-5">
-            <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
+            <h4 className="text-lg font-semibold flex items-center gap-2 text-white">
               <User className="w-4 h-4 text-[#f98f21]" />
               Seus Dados
             </h4>
@@ -278,7 +278,7 @@ export default function ReservaForm() {
 
           {/* Coluna 2: Data */}
           <div className="space-y-5">
-            <h4 className="text-lg font-light flex items-center gap-2 text-white/90">
+            <h4 className="text-lg font-semibold flex items-center gap-2 text-white">
               <Calendar className="w-4 h-4 text-[#f98f21]" />
               Data da Reserva
             </h4>
@@ -305,8 +305,8 @@ export default function ReservaForm() {
         </div>
 
         {/* Seleção de Área (largura total) */}
-        <div className="border-t border-white/10 pt-6">
-          <h4 className="text-lg font-light flex items-center gap-2 text-white/90 mb-4">
+        <div className="border-t border-white/20 pt-6">
+          <h4 className="text-lg font-semibold flex items-center gap-2 text-white mb-4">
             <MapPin className="w-4 h-4 text-[#f98f21]" />
             Área do Restaurante
           </h4>
@@ -332,7 +332,7 @@ export default function ReservaForm() {
         </div>
 
         {/* Mapa de Mesas (largura total) */}
-        <div className="border-t border-white/10 pt-6">
+        <div className="border-t border-white/20 pt-6">
           <MapaMesas
             data={watchedData || ''}
             horario={watchedHorario || ''}
@@ -343,8 +343,8 @@ export default function ReservaForm() {
         </div>
 
         {/* Linha 3: Resumo e Botão de Pagamento */}
-        <div className="border-t border-white/10 pt-6">
-          <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+        <div className="border-t border-white/20 pt-6">
+          <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.03] rounded-xl p-5 border border-white/20 backdrop-blur-sm">
             {/* Destaque do benefício */}
             <div className="bg-[#25bcc0]/20 border border-[#25bcc0]/30 rounded-lg p-3 mb-4 flex items-center gap-3">
               <div className="bg-[#25bcc0] rounded-full p-2 shrink-0">
@@ -362,11 +362,11 @@ export default function ReservaForm() {
               {/* Info do valor */}
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-sm text-white/60 mb-1">Valor da Reserva</p>
+                  <p className="text-sm text-white/80 mb-1 font-medium">Valor da Reserva</p>
                   <p className="text-3xl font-bold text-[#ffc95b]">R$ 50,00</p>
                 </div>
-                <div className="border-l border-white/10 pl-4">
-                  <div className="bg-[#25bcc0]/20 text-[#25bcc0] text-xs font-bold px-2 py-1 rounded-full inline-block">
+                <div className="border-l border-white/20 pl-4">
+                  <div className="bg-[#25bcc0]/30 text-[#25bcc0] text-xs font-bold px-3 py-2 rounded-full inline-block border border-[#25bcc0]/50">
                     100% VIRA CONSUMAÇÃO
                   </div>
                 </div>
@@ -376,7 +376,7 @@ export default function ReservaForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full md:w-auto bg-[#d71919] hover:bg-[#b71515] text-white font-bold text-base px-8 py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#d71919]/30 hover:scale-105"
+                className="w-full md:w-auto bg-gradient-to-r from-[#d71919] to-[#f98f21] hover:from-[#b71515] hover:to-[#d97a1c] text-white font-bold text-base px-8 py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-[#d71919]/40 hover:scale-105 border border-[#f98f21]/30"
               >
                 {loading ? (
                   'Processando...'
@@ -389,7 +389,7 @@ export default function ReservaForm() {
               </button>
             </div>
 
-            <p className="text-xs text-white/30 mt-3 text-center md:text-left">
+            <p className="text-xs text-white/60 mt-3 text-center md:text-left">
               Em caso de não comparecimento, o valor ficará retido • Pagamento seguro via PIX
             </p>
           </div>
