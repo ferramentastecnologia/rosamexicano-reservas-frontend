@@ -106,7 +106,7 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
 
   const toggleTable = (tableNumber: number) => {
     const table = tables.find(t => t.number === tableNumber);
-    if (!table || !table.available) return;
+    if (!table) return;
 
     setSelectedTables(prev => {
       const isSelected = prev.includes(tableNumber);
@@ -117,33 +117,35 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
         setAlertMessage('');
         return newSelection;
       } else {
-        // Calcular capacidade total após adicionar esta mesa
+        // Permitir seleção de qualquer mesa disponível
         const newSelection = [...prev, tableNumber];
         const totalCapacity = calculateTotalCapacity(newSelection, tables);
 
-        // Validar se não ultrapassa o número de pessoas
-        if (totalCapacity >= numeroPessoas) {
-          // Validação de combinação de mesas
-          // Mostrar alerta se a mesa não pode ser combinada
-          if (!canTableBeCombined(tableNumber)) {
-            let mensagem = `⚠️ Mesa ${tableNumber} não pode ser combinada com outras mesas\n`;
-            mensagem += `Mesas com restrição: 1-8, 10, 11, 12`;
-            setAlertMessage(mensagem);
-          } else {
-            // Validar se pode combinar com as mesas já selecionadas
-            for (const selectedTable of prev) {
-              if (!canTablesBeJoined(tableNumber, selectedTable)) {
-                let mensagem = `⚠️ Mesa ${tableNumber} não pode combinar com mesa ${selectedTable}\n`;
-                mensagem += `Combinações permitidas: 14+16 (vinculadas) ou demais mesas`;
-                setAlertMessage(mensagem);
-              }
+        // Validação de combinação de mesas - APENAS AVISO, NÃO BLOQUEIA
+        // Mostrar alerta se a mesa não pode ser combinada
+        if (!canTableBeCombined(tableNumber)) {
+          let mensagem = `⚠️ Mesa ${tableNumber} não pode ser combinada com outras mesas\n`;
+          mensagem += `Mesas com restrição: 1-8, 10, 11, 12`;
+          setAlertMessage(mensagem);
+        } else {
+          // Validar se pode combinar com as mesas já selecionadas
+          let temAlerta = false;
+          for (const selectedTable of prev) {
+            if (!canTablesBeJoined(tableNumber, selectedTable)) {
+              let mensagem = `⚠️ Mesa ${tableNumber} não pode combinar com mesa ${selectedTable}\n`;
+              mensagem += `Combinações permitidas: 14+16 (vinculadas) ou demais mesas`;
+              setAlertMessage(mensagem);
+              temAlerta = true;
+              break;
             }
           }
-
-          onMesasSelect(newSelection.sort((a, b) => a - b));
-          return newSelection.sort((a, b) => a - b);
+          if (!temAlerta) {
+            setAlertMessage('');
+          }
         }
-        return prev;
+
+        onMesasSelect(newSelection.sort((a, b) => a - b));
+        return newSelection.sort((a, b) => a - b);
       }
     });
   };
@@ -249,16 +251,15 @@ export default function MapaMesas({ data, horario, numeroPessoas, selectedArea, 
                 <button
                   key={table.number}
                   type="button"
-                  onClick={() => toggleTable(table.number)}
-                  disabled={!isAvailable}
+                  onClick={() => isAvailable && toggleTable(table.number)}
                   className={`
                     aspect-square rounded-lg border flex flex-col items-center justify-center
-                    transition-all duration-200 relative
+                    transition-all duration-200 relative cursor-pointer
                     ${isSelected
                       ? 'bg-[#d71919] border-transparent text-white scale-105 shadow-lg shadow-[#d71919]/30'
                       : isAvailable
                         ? 'bg-white/5 border-white/10 text-white/70 hover:border-[#f98f21]/50 hover:bg-white/10 hover:scale-105'
-                        : 'bg-black/30 border-white/5 text-white/20 cursor-not-allowed'
+                        : 'bg-black/30 border-white/5 text-white/20 cursor-not-allowed opacity-50'
                     }
                   `}
                 >
