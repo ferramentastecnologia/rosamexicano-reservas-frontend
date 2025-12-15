@@ -133,9 +133,9 @@ export default function ReservaForm() {
     }
   };
 
-  const inputClasses = "w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:border-[#f98f21] focus:bg-white/10 text-white placeholder:text-white/50 transition-all";
-  const labelClasses = "block text-sm font-medium text-white/90 mb-2";
-  const errorClasses = "text-[#d71919] text-xs mt-1 font-medium";
+  const inputClasses = "w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:border-[#f98f21] focus:bg-white/10 text-base text-white placeholder:text-white/50 transition-all";
+  const labelClasses = "block text-base font-medium text-white/90 mb-3";
+  const errorClasses = "text-[#d71919] text-sm mt-1 font-medium";
 
   return (
     <div className="bg-white/[0.08] backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl">
@@ -144,7 +144,7 @@ export default function ReservaForm() {
         <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
           {/* Coluna 1: Dados Pessoais */}
           <div className="space-y-5">
-            <h4 className="text-lg font-semibold flex items-center gap-2 text-white">
+            <h4 className="text-xl font-semibold flex items-center gap-2 text-white">
               <User className="w-4 h-4 text-[#f98f21]" />
               Seus Dados
             </h4>
@@ -278,7 +278,7 @@ export default function ReservaForm() {
 
           {/* Coluna 2: Data */}
           <div className="space-y-5">
-            <h4 className="text-lg font-semibold flex items-center gap-2 text-white">
+            <h4 className="text-xl font-semibold flex items-center gap-2 text-white">
               <Calendar className="w-4 h-4 text-[#f98f21]" />
               Data da Reserva
             </h4>

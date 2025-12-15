@@ -118,19 +118,19 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
   }
 
   return (
-    <div className="bg-black/30 rounded-xl border border-white/5 p-4">
+    <div className="bg-white/5 rounded-xl border border-white/20 p-5">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <button
           type="button"
           onClick={prevMonth}
           disabled={currentMonth === today.getMonth()}
-          className="p-1.5 hover:bg-white/5 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
+          className="p-2 hover:bg-white/10 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronLeft className="w-4 h-4 text-white/70" />
+          <ChevronLeft className="w-5 h-5 text-white/70" />
         </button>
 
-        <h3 className="text-sm font-medium text-white/90">
+        <h3 className="text-lg font-semibold text-white">
           {monthNames[currentMonth]} {currentYear}
         </h3>
 
@@ -138,18 +138,18 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
           type="button"
           onClick={nextMonth}
           disabled={currentMonth === 11}
-          className="p-1.5 hover:bg-white/5 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
+          className="p-2 hover:bg-white/10 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronRight className="w-4 h-4 text-white/70" />
+          <ChevronRight className="w-5 h-5 text-white/70" />
         </button>
       </div>
 
       {/* Dias da semana */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-3">
         {weekDays.map((day, i) => (
           <div
             key={i}
-            className="text-center text-xs font-light text-white/40 py-1"
+            className="text-center text-sm font-medium text-white/60 py-2"
           >
             {day}
           </div>
@@ -157,7 +157,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
       </div>
 
       {/* Dias do mês */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {days.map((day, index) => {
           if (!day) {
             return <div key={`empty-${index}`} className="aspect-square" />;
@@ -173,7 +173,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
               onClick={() => handleDateClick(day)}
               disabled={!day.available}
               className={`
-                aspect-square rounded-lg flex items-center justify-center text-xs font-light transition-all
+                aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all
                 ${day.available
                   ? isSelected
                     ? 'btn-mexican text-white'
