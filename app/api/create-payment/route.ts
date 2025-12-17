@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendTelegramNotification } from '@/lib/telegram-notifier';
 
 const ASAAS_API_URL = process.env.ASAAS_API_URL || 'https://sandbox.asaas.com/api/v3';
 const ASAAS_API_KEY = process.env.ASAAS_API_KEY || '';
@@ -127,6 +128,16 @@ export async function POST(request: Request) {
     });
 
     console.log('Reserva criada com sucesso:', reservation.id);
+
+    // 4.5 Enviar alerta Telegram para reservas de última hora (mesmo dia)
+    await sendTelegramNotification({
+      customerName: nome,
+      reservationDate: dataReserva,
+      reservationTime: horario,
+      partySize: numeroPessoas,
+      reservationId: reservation.id,
+      value: 50.00,
+    });
 
     // 5. Buscar dados do PIX (QR Code)
     console.log('Buscando QR Code PIX...');

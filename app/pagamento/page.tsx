@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import QRCode from 'qrcode';
 import { Check, Copy, Clock, CheckCircle } from 'lucide-react';
+import { CaixaInformacao } from '@/components/CaixaInformacao';
 
 type ReservationData = {
   nome: string;
@@ -230,6 +231,13 @@ function PagamentoContent() {
 
       <div className="container mx-auto px-4 py-4">
         <div className="max-w-6xl mx-auto">
+          {/* Caixa de Informação para o Caixa - Visível apenas se tem dados da reserva */}
+          {paymentData?.reservationData && (
+            <div className="mb-6">
+              <CaixaInformacao customerName={paymentData.reservationData.nome} />
+            </div>
+          )}
+
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Coluna 1 - Pagamento PIX */}
             <div className="space-y-4">
