@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { comparePassword, generateTokenPair } from '@/lib/auth-utils';
 import {
@@ -18,11 +17,21 @@ export async function POST(request: Request) {
 
   try {
     // Extrair e validar body
-    const { email, password } = await getJsonBody<{ email?: string; password?: string }>(request);
+    const body = await getJsonBody<{ email?: string; password?: string }>(request);
+    const { email, password } = body;
 
     // Validação de entrada
     validateRequired(email, 'Email');
     validateRequired(password, 'Senha');
+
+    // Type narrowing após validações
+    if (typeof email !== 'string') {
+      throw new ValidationError('Email deve ser uma string', 'email');
+    }
+    if (typeof password !== 'string') {
+      throw new ValidationError('Senha deve ser uma string', 'password');
+    }
+
     validateEmail(email);
 
     // Buscar usuário pelo email
@@ -58,7 +67,7 @@ export async function POST(request: Request) {
     console.log(`✅ Login realizado: ${user.email} (${requestId})`);
 
     // Criar resposta
-    let response = successResponse(
+    const response = successResponse(
       {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -75,9 +84,7 @@ export async function POST(request: Request) {
     );
 
     // Adicionar security headers
-    response = applySecurityMiddleware(response, requestId);
-
-    return response;
+    return applySecurityMiddleware(response, requestId);
   } catch (error) {
     return errorResponse(error, undefined, requestId);
   }
