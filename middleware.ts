@@ -11,7 +11,9 @@ import { verifyAccessToken, extractTokenFromHeader, AuthToken } from './lib/auth
 const PROTECTED_ROUTES = ['/api/admin', '/admin'];
 
 // Rotas públicas (sem autenticação)
-const PUBLIC_ROUTES = ['/api/admin/auth', '/'];
+// /admin é a página de login, então deve ser pública
+// /api/admin/auth é a API de login, também pública
+const PUBLIC_ROUTES = ['/api/admin/auth', '/', '/admin'];
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
