@@ -27,8 +27,9 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_user', JSON.stringify(data.user));
+        // API retorna accessToken (não token)
+        localStorage.setItem('admin_token', data.data.accessToken);
+        localStorage.setItem('admin_user', JSON.stringify(data.data.user));
         router.push('/admin/dashboard');
       } else {
         setError(data.error || 'Email ou senha incorretos');
