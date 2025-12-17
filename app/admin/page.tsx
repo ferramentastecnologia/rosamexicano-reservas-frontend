@@ -26,13 +26,12 @@ export default function AdminLoginPage() {
 
       const data = await response.json();
 
-      if (data.success) {
-        // API retorna accessToken (não token)
+      if (data.success && data.data?.accessToken) {
         localStorage.setItem('admin_token', data.data.accessToken);
-        localStorage.setItem('admin_user', JSON.stringify(data.data.user));
+        localStorage.setItem('admin_user', JSON.stringify(data.data.user || {}));
         router.push('/admin/dashboard');
       } else {
-        setError(data.error || 'Email ou senha incorretos');
+        setError(data.error || data.message || 'Email ou senha incorretos');
       }
     } catch (error) {
       setError('Erro ao fazer login');

@@ -52,8 +52,14 @@ export default function AdminDashboard() {
   const loadStats = async () => {
     try {
       const response = await adminFetch('/api/admin/stats');
+      if (!response.ok) {
+        console.error('Erro na resposta:', response.status);
+        return;
+      }
       const data = await response.json();
-      setStats(data);
+      if (data && !data.error) {
+        setStats(data);
+      }
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error);
     } finally {
