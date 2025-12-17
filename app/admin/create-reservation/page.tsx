@@ -19,6 +19,7 @@ import {
   Phone,
   CheckCircle
 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-api';
 
 const horarios = ['18:00', '18:30', '19:00', '19:30'];
 
@@ -62,9 +63,8 @@ export default function AdminCreateReservation() {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/admin/create-reservation', {
+      const response = await adminFetch('/api/admin/create-reservation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 

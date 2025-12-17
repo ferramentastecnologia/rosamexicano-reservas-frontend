@@ -69,6 +69,8 @@ export function middleware(request: NextRequest) {
 }
 
 // Configurar rotas monitoradas pelo middleware
+// Apenas APIs admin são protegidas pelo middleware
+// Páginas /admin/* fazem verificação de auth no client-side
 export const config = {
-  matcher: ['/api/admin/:path*', '/admin/:path*'],
+  matcher: ['/api/admin/:path*'],
 };

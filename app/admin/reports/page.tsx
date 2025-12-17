@@ -25,6 +25,7 @@ import {
   CalendarDays,
   FileSpreadsheet
 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-api';
 
 type ReservaDetalhe = {
   id: string;
@@ -107,7 +108,7 @@ export default function AdminReports() {
       const url = tipoRelatorio === 'diario'
         ? `/api/admin/reports?data=${dataEspecifica}`
         : `/api/admin/reports?periodo=${periodo}`;
-      const response = await fetch(url);
+      const response = await adminFetch(url);
       const result = await response.json();
       if (response.ok) {
         setData(result);

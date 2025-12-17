@@ -20,6 +20,7 @@ import {
   ChevronUp,
   ChevronDown
 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-api';
 
 type Admin = {
   id: string;
@@ -80,7 +81,7 @@ export default function AdminUsuarios() {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await adminFetch('/api/admin/users');
       const data = await response.json();
       setUsers(data);
     } catch (err) {
@@ -206,9 +207,8 @@ export default function AdminUsuarios() {
         delete (body as any).password;
       }
 
-      const response = await fetch(url, {
+      const response = await adminFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -231,7 +231,7 @@ export default function AdminUsuarios() {
     if (!confirm(`Deseja realmente excluir o usuário ${user.name}?`)) return;
 
     try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
+      const response = await adminFetch(`/api/admin/users/${user.id}`, {
         method: 'DELETE',
       });
 

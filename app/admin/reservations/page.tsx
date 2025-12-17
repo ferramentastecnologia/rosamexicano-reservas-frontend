@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { adminFetch } from '@/lib/admin-api';
 
 type Voucher = {
   id: string;
@@ -80,7 +81,7 @@ export default function AdminReservations() {
 
   const loadReservations = async () => {
     try {
-      const response = await fetch('/api/admin/reservations');
+      const response = await adminFetch('/api/admin/reservations');
       const data = await response.json();
       setReservations(data);
     } catch (error) {

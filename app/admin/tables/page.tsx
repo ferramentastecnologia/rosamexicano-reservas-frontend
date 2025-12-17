@@ -21,6 +21,7 @@ import {
   ChevronUp,
   ChevronDown
 } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-api';
 
 type TableArea = 'interno' | 'semi-externo' | 'externo';
 
@@ -104,9 +105,8 @@ export default function AdminTables() {
   const loadOccupancy = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/table-occupancy', {
+      const response = await adminFetch('/api/admin/table-occupancy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           data: selectedDate,
           horario: selectedTime,

@@ -20,6 +20,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { DashboardSkeleton } from '@/app/components/Skeleton';
+import { adminFetch } from '@/lib/admin-api';
 
 type Stats = {
   totalReservations: number;
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      const response = await adminFetch('/api/admin/stats');
       const data = await response.json();
       setStats(data);
     } catch (error) {

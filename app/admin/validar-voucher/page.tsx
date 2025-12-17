@@ -25,6 +25,7 @@ import {
   X
 } from 'lucide-react';
 import { TableSkeleton } from '@/app/components/Skeleton';
+import { adminFetch } from '@/lib/admin-api';
 
 type VoucherData = {
   id: string;
@@ -78,7 +79,7 @@ export default function VouchersPage() {
 
   const loadVouchers = async () => {
     try {
-      const response = await fetch('/api/admin/vouchers');
+      const response = await adminFetch('/api/admin/vouchers');
       const data = await response.json();
       if (data.vouchers) {
         setVouchers(data.vouchers);
@@ -146,7 +147,7 @@ export default function VouchersPage() {
     setMessage(null);
 
     try {
-      const response = await fetch(`/api/admin/voucher/${voucher.codigo}/validar`, {
+      const response = await adminFetch(`/api/admin/voucher/${voucher.codigo}/validar`, {
         method: 'POST',
       });
       const data = await response.json();
