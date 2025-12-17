@@ -1,77 +1,59 @@
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { comparePassword, generateTokenPair } from '@/lib/auth-utils';
-import {
-  successResponse,
-  errorResponse,
-  ValidationError,
-  AuthenticationError,
-  getJsonBody,
-  generateRequestId,
-  validateRequired,
-  validateEmail,
-} from '@/lib/error-handler';
-import { applySecurityMiddleware } from '@/lib/security-headers';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
-  const requestId = generateRequestId();
-
   try {
-    // Extrair e validar body
-    const body = await getJsonBody<{ email?: string; password?: string }>(request);
+    const body = await request.json();
     const { email, password } = body;
 
-    // Validação de entrada
-    validateRequired(email, 'Email');
-    validateRequired(password, 'Senha');
-
-    // Type narrowing após validações
-    if (typeof email !== 'string') {
-      throw new ValidationError('Email deve ser uma string', 'email');
-    }
-    if (typeof password !== 'string') {
-      throw new ValidationError('Senha deve ser uma string', 'password');
+    // Validação básica
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, error: 'Email e senha são obrigatórios' },
+        { status: 400 }
+      );
     }
 
-    validateEmail(email);
-
-    // Buscar usuário pelo email
+    // Buscar usuário
     const user = await prisma.admin.findUnique({
       where: { email: email.toLowerCase() },
     });
 
     if (!user) {
-      throw new AuthenticationError('Email ou senha incorretos');
+      return NextResponse.json(
+        { success: false, error: 'Email ou senha incorretos' },
+        { status: 401 }
+      );
     }
 
-    // Verificar se usuário está ativo
+    // Verificar se está ativo
     if (!user.active) {
-      throw new AuthenticationError('Usuário desativado');
+      return NextResponse.json(
+        { success: false, error: 'Usuário desativado' },
+        { status: 401 }
+      );
     }
 
-    // Verificar senha usando bcrypt
-    const passwordMatch = await comparePassword(password, user.password);
+    // Verificar senha
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      throw new AuthenticationError('Email ou senha incorretos');
+      return NextResponse.json(
+        { success: false, error: 'Email ou senha incorretos' },
+        { status: 401 }
+      );
     }
 
-    // Gerar tokens JWT
+    // Login OK - retorna dados do usuário (sem JWT complexo)
     const permissions = user.permissions ? JSON.parse(user.permissions) : [];
-    const tokens = generateTokenPair({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      permissions,
-    });
 
-    console.log(`✅ Login realizado: ${user.email} (${requestId})`);
+    console.log(`✅ Login realizado: ${user.email}`);
 
-    // Criar resposta
-    const response = successResponse(
-      {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-        expiresIn: tokens.expiresIn,
+    return NextResponse.json({
+      success: true,
+      data: {
+        accessToken: 'logged-in', // Token simples só para client-side check
         user: {
           id: user.id,
           email: user.email,
@@ -80,12 +62,12 @@ export async function POST(request: Request) {
           permissions,
         },
       },
-      200
-    );
-
-    // Adicionar security headers
-    return applySecurityMiddleware(response, requestId);
+    });
   } catch (error) {
-    return errorResponse(error, undefined, requestId);
+    console.error('Erro no login:', error);
+    return NextResponse.json(
+      { success: false, error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
   }
 }
