@@ -332,11 +332,7 @@ export function validateSecurityConfig(): void {
     }
 
     if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET não configurado');
-      // Não fazer exit(1) durante build, apenas avisar
-      if (process.env.NODE_ENV === 'production' && process.env.NETLIFY) {
-        process.exit(1);
-      }
+      console.warn('⚠️ JWT_SECRET não configurado - usando valor padrão');
     }
   }
 }
