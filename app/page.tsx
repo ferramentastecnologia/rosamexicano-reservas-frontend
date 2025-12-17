@@ -138,7 +138,7 @@ export default function Home() {
         </section>
 
         {/* Benefícios com cores */}
-        <section className="py-16 px-4 bg-[#C2185B]/20">
+        <section className="py-16 px-4">
           <div className="container mx-auto max-w-5xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Por que escolher o <span className="text-[#FFD700]">Rosa Mexicano</span>?
@@ -181,7 +181,7 @@ export default function Home() {
         </section>
 
         {/* Formulário de Reserva */}
-        <section id="reserva" className="py-16 px-4 bg-[#C2185B]/15">
+        <section id="reserva" className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -243,7 +243,7 @@ export default function Home() {
         </section>
 
         {/* Como Funciona */}
-        <section className="py-16 px-4 bg-[#BA68C8]/20">
+        <section className="py-16 px-4">
           <div className="container mx-auto max-w-3xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
               Como <span className="text-[#FFD700]">funciona</span>?
@@ -279,7 +279,7 @@ export default function Home() {
         </section>
 
         {/* Galeria */}
-        <section className="py-16 px-4 bg-[#FFD700]/15">
+        <section className="py-16 px-4">
           <div className="container mx-auto max-w-5xl">
             <h3 className="text-2xl md:text-3xl font-bold text-center mb-10">
               Nosso <span className="text-[#FFD700]">Ambiente</span>
@@ -315,7 +315,7 @@ export default function Home() {
         </section>
 
         {/* Localização */}
-        <section className="py-16 px-4 bg-[#BA68C8]/20">
+        <section className="py-16 px-4">
           <div className="container mx-auto max-w-5xl">
             <div className="bg-[#C2185B]/20 rounded-2xl p-6 md:p-8 border border-white/30 backdrop-blur-sm shadow-lg shadow-[#BA68C8]/15">
               <div className="grid md:grid-cols-2 gap-8">
@@ -383,7 +383,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="py-10 px-4 bg-[#C2185B]/15 border-t border-white/20">
+        <footer className="py-10 px-4 border-t border-white/10">
           <div className="container mx-auto text-center">
             <Image
               src="/images/logo-rosa-mexicano.png"
