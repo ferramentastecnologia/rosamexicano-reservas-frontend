@@ -107,19 +107,19 @@ export default function ReservaForm() {
     }
   };
 
-  const inputClasses = "w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:border-[#f98f21] focus:bg-white/10 text-base text-white placeholder:text-white/50 transition-all";
-  const labelClasses = "block text-base font-medium text-white/90 mb-3";
+  const inputClasses = "w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:border-[#C2185B] focus:ring-2 focus:ring-[#C2185B]/20 text-base text-gray-800 placeholder:text-gray-400 transition-all shadow-sm";
+  const labelClasses = "block text-base font-medium text-gray-700 mb-3";
   const errorClasses = "text-[#d71919] text-sm mt-1 font-medium";
 
   return (
-    <div className="bg-white/[0.08] backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl">
+    <div className="bg-white rounded-2xl p-6 md:p-8 border-2 border-[#C2185B]/20 shadow-xl">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Linha 1: Dados Pessoais | Data e Horário */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
           {/* Coluna 1: Dados Pessoais */}
           <div className="space-y-5">
-            <h4 className="text-xl font-semibold flex items-center gap-2 text-white">
-              <User className="w-4 h-4 text-[#f98f21]" />
+            <h4 className="text-xl font-semibold flex items-center gap-2 text-gray-800">
+              <User className="w-4 h-4 text-[#C2185B]" />
               Seus Dados
             </h4>
 
@@ -171,7 +171,7 @@ export default function ReservaForm() {
             {/* Número de Pessoas */}
             <div>
               <label className={labelClasses}>
-                <Users className="w-3.5 h-3.5 inline mr-1.5 text-[#f98f21]" />
+                <Users className="w-3.5 h-3.5 inline mr-1.5 text-[#C2185B]" />
                 Número de Pessoas *
               </label>
               <input
@@ -195,7 +195,7 @@ export default function ReservaForm() {
                 className={inputClasses}
               />
               {errors.numeroPessoas && <p className={errorClasses}>{errors.numeroPessoas.message}</p>}
-              <p className="text-xs text-white/40 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 Múltiplos de 2 • Mín: 2 • Máx: 60
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function ReservaForm() {
             {/* Horário */}
             <div>
               <label className={labelClasses}>
-                <Clock className="w-3.5 h-3.5 inline mr-1.5 text-[#f98f21]" />
+                <Clock className="w-3.5 h-3.5 inline mr-1.5 text-[#C2185B]" />
                 Horário *
               </label>
               <input type="hidden" {...register('horario', { required: 'Horário é obrigatório' })} />
@@ -214,16 +214,16 @@ export default function ReservaForm() {
                   className={`${inputClasses} flex items-center justify-between cursor-pointer`}
                 >
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[#f98f21]" />
-                    <span className={selectedHorario ? 'text-white' : 'text-white/30'}>
+                    <Clock className="w-4 h-4 text-[#C2185B]" />
+                    <span className={selectedHorario ? 'text-gray-800' : 'text-gray-400'}>
                       {selectedHorario || 'Selecione o horário'}
                     </span>
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${horarioDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${horarioDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {horarioDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden shadow-xl">
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xl">
                     {horarios.map((horario) => (
                       <button
                         key={horario}
@@ -235,8 +235,8 @@ export default function ReservaForm() {
                         }}
                         className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-colors ${
                           selectedHorario === horario
-                            ? 'bg-[#d71919] text-white'
-                            : 'text-white/70 hover:bg-white/10 hover:text-white'
+                            ? 'bg-[#C2185B] text-white'
+                            : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
                         <Clock className="w-4 h-4" />
@@ -252,8 +252,8 @@ export default function ReservaForm() {
 
           {/* Coluna 2: Data */}
           <div className="space-y-5">
-            <h4 className="text-xl font-semibold flex items-center gap-2 text-white">
-              <Calendar className="w-4 h-4 text-[#f98f21]" />
+            <h4 className="text-xl font-semibold flex items-center gap-2 text-gray-800">
+              <Calendar className="w-4 h-4 text-[#C2185B]" />
               Data da Reserva
             </h4>
 
@@ -266,7 +266,7 @@ export default function ReservaForm() {
               />
               {errors.data && <p className={errorClasses}>{errors.data.message}</p>}
               {selectedDate && (
-                <p className="text-[#f98f21] text-xs mt-2">
+                <p className="text-[#C2185B] text-xs mt-2 font-medium">
                   {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
                     weekday: 'long',
                     day: '2-digit',
@@ -280,18 +280,18 @@ export default function ReservaForm() {
 
 
         {/* Linha 3: Resumo e Botão de Pagamento */}
-        <div className="border-t border-white/20 pt-6">
-          <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.03] rounded-xl p-5 border border-white/20 backdrop-blur-sm">
+        <div className="border-t border-gray-200 pt-6">
+          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
             {/* Destaque do benefício */}
-            <div className="bg-[#25bcc0]/20 border border-[#25bcc0]/30 rounded-lg p-3 mb-4 flex items-center gap-3">
-              <div className="bg-[#25bcc0] rounded-full p-2 shrink-0">
-                <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <div className="bg-[#00897B]/10 border border-[#00897B]/30 rounded-lg p-3 mb-4 flex items-center gap-3">
+              <div className="bg-[#00897B] rounded-full p-2 shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
               <div>
-                <p className="text-[#25bcc0] font-bold text-sm">Você não perde nada!</p>
-                <p className="text-white/70 text-xs">Os R$ 50 viram crédito para consumir no restaurante</p>
+                <p className="text-[#00897B] font-bold text-sm">Você não perde nada!</p>
+                <p className="text-gray-600 text-xs">Os R$ 50 viram crédito para consumir no restaurante</p>
               </div>
             </div>
 
@@ -299,11 +299,11 @@ export default function ReservaForm() {
               {/* Info do valor */}
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-sm text-white/80 mb-1 font-medium">Valor da Reserva</p>
-                  <p className="text-3xl font-bold text-[#ffc95b]">R$ 50,00</p>
+                  <p className="text-sm text-gray-600 mb-1 font-medium">Valor da Reserva</p>
+                  <p className="text-3xl font-bold text-[#E65100]">R$ 50,00</p>
                 </div>
-                <div className="border-l border-white/20 pl-4">
-                  <div className="bg-[#25bcc0]/30 text-[#25bcc0] text-xs font-bold px-3 py-2 rounded-full inline-block border border-[#25bcc0]/50">
+                <div className="border-l border-gray-300 pl-4">
+                  <div className="bg-[#00897B]/10 text-[#00897B] text-xs font-bold px-3 py-2 rounded-full inline-block border border-[#00897B]/30">
                     100% VIRA CONSUMAÇÃO
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export default function ReservaForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full md:w-auto bg-gradient-to-r from-[#d71919] to-[#f98f21] hover:from-[#b71515] hover:to-[#d97a1c] text-white font-bold text-base px-8 py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-[#d71919]/40 hover:scale-105 border border-[#f98f21]/30"
+                className="w-full md:w-auto bg-gradient-to-r from-[#C2185B] to-[#E65100] hover:from-[#a8155a] hover:to-[#d45a00] text-white font-bold text-base px-8 py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#C2185B]/30 hover:scale-105"
               >
                 {loading ? (
                   'Processando...'
@@ -326,7 +326,7 @@ export default function ReservaForm() {
               </button>
             </div>
 
-            <p className="text-xs text-white/60 mt-3 text-center md:text-left">
+            <p className="text-xs text-gray-500 mt-3 text-center md:text-left">
               Em caso de não comparecimento, o valor ficará retido • Pagamento seguro via PIX
             </p>
           </div>

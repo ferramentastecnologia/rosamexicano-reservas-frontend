@@ -111,26 +111,26 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
 
   if (!today) {
     return (
-      <div className="bg-black/30 rounded-xl border border-white/5 p-5 flex items-center justify-center min-h-[280px]">
-        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#f98f21]"></div>
+      <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 flex items-center justify-center min-h-[280px]">
+        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#C2185B]"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/5 rounded-xl border border-white/20 p-5">
+    <div className="bg-gray-50 rounded-xl border border-gray-200 p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <button
           type="button"
           onClick={prevMonth}
           disabled={currentMonth === today.getMonth()}
-          className="p-2 hover:bg-white/10 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
+          className="p-2 hover:bg-gray-200 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronLeft className="w-5 h-5 text-white/70" />
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
 
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold text-gray-800">
           {monthNames[currentMonth]} {currentYear}
         </h3>
 
@@ -138,9 +138,9 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
           type="button"
           onClick={nextMonth}
           disabled={currentMonth === 11}
-          className="p-2 hover:bg-white/10 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
+          className="p-2 hover:bg-gray-200 rounded-lg transition disabled:opacity-20 disabled:cursor-not-allowed"
         >
-          <ChevronRight className="w-5 h-5 text-white/70" />
+          <ChevronRight className="w-5 h-5 text-gray-600" />
         </button>
       </div>
 
@@ -149,7 +149,7 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
         {weekDays.map((day, i) => (
           <div
             key={i}
-            className="text-center text-sm font-medium text-white/60 py-2"
+            className="text-center text-sm font-medium text-gray-500 py-2"
           >
             {day}
           </div>
@@ -176,9 +176,9 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
                 aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all
                 ${day.available
                   ? isSelected
-                    ? 'btn-mexican text-white'
-                    : 'bg-white/5 text-white/70 hover:bg-[#f98f21]/20 hover:text-white'
-                  : 'text-white/20 cursor-not-allowed'
+                    ? 'bg-[#C2185B] text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-[#C2185B]/10 hover:text-[#C2185B] border border-gray-200'
+                  : 'text-gray-300 cursor-not-allowed'
                 }
               `}
             >
@@ -189,18 +189,18 @@ export default function CalendarioReserva({ onSelectDate, selectedDate }: Calend
       </div>
 
       {/* Legenda */}
-      <div className="mt-4 pt-3 border-t border-white/5">
+      <div className="mt-4 pt-3 border-t border-gray-200">
         <div className="flex flex-wrap gap-3 text-xs">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded btn-mexican"></div>
-            <span className="text-white/40">Selecionada</span>
+            <div className="w-3 h-3 rounded bg-[#C2185B]"></div>
+            <span className="text-gray-500">Selecionada</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-white/5"></div>
-            <span className="text-white/40">Disponível</span>
+            <div className="w-3 h-3 rounded bg-white border border-gray-200"></div>
+            <span className="text-gray-500">Disponível</span>
           </div>
         </div>
-        <p className="text-[10px] text-white/30 mt-2">
+        <p className="text-[10px] text-gray-400 mt-2">
           Fechado: 24/12, 25/12 e 31/12
         </p>
       </div>
