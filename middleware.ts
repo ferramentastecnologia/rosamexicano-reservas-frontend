@@ -1,76 +1,15 @@
 /**
- * Middleware de Autenticação para Next.js
- *
- * Valida JWT tokens em requisições para rotas protegidas
+ * Middleware simplificado - sem validação JWT
+ * A autenticação é feita no client-side
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyAccessToken, extractTokenFromHeader, AuthToken } from './lib/auth-utils';
+import { NextResponse } from 'next/server';
 
-// Rotas que requerem autenticação
-const PROTECTED_ROUTES = ['/api/admin', '/admin'];
-
-// Rotas públicas (sem autenticação)
-// /admin é a página de login, então deve ser pública
-// /api/admin/auth é a API de login, também pública
-const PUBLIC_ROUTES = ['/api/admin/auth', '/', '/admin'];
-
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-
-  // Verificar se é rota protegida
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname === route);
-
-  // Se é rota pública, deixar passar
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
-
-  // Se é rota protegida, validar token
-  if (isProtectedRoute) {
-    const authHeader = request.headers.get('authorization') || undefined;
-
-    try {
-      const token = extractTokenFromHeader(authHeader);
-
-      if (!token) {
-        return NextResponse.json(
-          { success: false, error: 'Token ausente' },
-          { status: 401 }
-        );
-      }
-
-      // Validar token
-      const decoded = verifyAccessToken(token) as AuthToken;
-
-      // Adicionar dados do usuário ao request
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', decoded.userId);
-      requestHeaders.set('x-user-email', decoded.email);
-      requestHeaders.set('x-user-role', decoded.role);
-      requestHeaders.set('x-user-permissions', JSON.stringify(decoded.permissions));
-
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro de autenticação';
-      return NextResponse.json(
-        { success: false, error: message },
-        { status: 401 }
-      );
-    }
-  }
-
+export function middleware() {
+  // Deixa tudo passar - autenticação feita no client-side
   return NextResponse.next();
 }
 
-// Configurar rotas monitoradas pelo middleware
-// Apenas APIs admin são protegidas pelo middleware
-// Páginas /admin/* fazem verificação de auth no client-side
 export const config = {
-  matcher: ['/api/admin/:path*'],
+  matcher: [],
 };
