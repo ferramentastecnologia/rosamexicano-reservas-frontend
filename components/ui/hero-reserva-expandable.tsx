@@ -5,6 +5,7 @@ import { X, Calendar, Users, Clock, Check, ChevronDown, CreditCard, User, MapPin
 import { motion, AnimatePresence } from "framer-motion"
 import { GodRays, MeshGradient } from "@paper-design/shaders-react"
 import Image from "next/image"
+import Link from "next/link"
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 
@@ -838,6 +839,17 @@ export default function HeroReservaExpandable() {
                               100% CONSUMAÇÃO
                             </span>
                           </div>
+
+                          <p className="text-[10px] text-white/60 text-center mb-3">
+                            Ao continuar, você declara que leu e concorda com a{' '}
+                            <Link href="/privacidade" className="text-[#FFD700] hover:underline" target="_blank">
+                              Política de Privacidade
+                            </Link>{' '}
+                            e os{' '}
+                            <Link href="/termos" className="text-[#FFD700] hover:underline" target="_blank">
+                              Termos de Serviço
+                            </Link>.
+                          </p>
 
                           <button
                             disabled={formStep === "submitting"}
