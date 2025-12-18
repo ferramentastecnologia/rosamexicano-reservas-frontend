@@ -56,8 +56,8 @@ export default function TermosServico() {
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-amber-800 mb-2">Cancelamento pelo Cliente</h3>
             <ul className="list-disc pl-6 text-amber-900 space-y-2">
-              <li><strong>Com 48 horas ou mais de antecedência:</strong> Reembolso integral de R$ 50,00</li>
-              <li><strong>Com menos de 48 horas:</strong> Valor retido como taxa administrativa</li>
+              <li><strong>Com 24 horas ou mais de antecedência:</strong> Reembolso integral de R$ 50,00</li>
+              <li><strong>Com menos de 24 horas:</strong> Valor retido integralmente</li>
               <li><strong>Não comparecimento (no-show):</strong> Valor retido integralmente</li>
             </ul>
           </div>
