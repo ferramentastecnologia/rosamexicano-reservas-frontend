@@ -325,7 +325,7 @@ export default function HeroReservaExpandable() {
           >
             {/* Badge */}
             <div className="inline-flex items-center px-5 py-2 rounded-full bg-[#C2185B] text-white text-xs font-bold mb-6 shadow-lg">
-              Final de Ano 2024/2025
+              Final de Ano 2025
             </div>
 
             {/* Título */}
