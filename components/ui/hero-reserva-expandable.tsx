@@ -8,6 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
+import { Magnetic } from './magnetic'
 
 // CSS proporcional para o modal
 const modalStyles = `
@@ -558,26 +559,32 @@ export default function HeroReservaExpandable() {
               {/* Botão CTA Principal (embaixo) */}
               <AnimatePresence initial={false}>
                 {!isExpanded && (
-                  <motion.div className="inline-block relative">
-                    <motion.div
-                      style={{ borderRadius: "100px" }}
-                      layout
-                      layoutId="cta-card"
-                      className="absolute inset-0 bg-gradient-to-r from-[#C2185B] to-[#E65100]"
-                    />
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      layout={false}
-                      onClick={handleExpand}
-                      className="relative flex items-center gap-3 h-16 md:h-20 px-12 md:px-16 py-4 text-xl md:text-2xl font-bold text-white tracking-wide hover:scale-105 transition-all duration-300 shadow-lg"
-                    >
-                      Fazer Reserva
-                      <Calendar className="w-6 h-6 md:w-7 md:h-7" />
-                    </motion.button>
-                  </motion.div>
+                  <Magnetic intensity={0.2} range={200} springOptions={{ bounce: 0.1 }}>
+                    <motion.div className="inline-block relative">
+                      <motion.div
+                        style={{ borderRadius: "100px" }}
+                        layout
+                        layoutId="cta-card"
+                        className="absolute inset-0 bg-gradient-to-r from-[#C2185B] to-[#E65100]"
+                      />
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        layout={false}
+                        onClick={handleExpand}
+                        className="relative flex items-center gap-3 h-16 md:h-20 px-12 md:px-16 py-4 text-xl md:text-2xl font-bold text-white tracking-wide hover:scale-105 transition-all duration-300 shadow-lg"
+                      >
+                        <Magnetic intensity={0.1} range={200} springOptions={{ bounce: 0.1 }}>
+                          <span className="flex items-center gap-3">
+                            Fazer Reserva
+                            <Calendar className="w-6 h-6 md:w-7 md:h-7" />
+                          </span>
+                        </Magnetic>
+                      </motion.button>
+                    </motion.div>
+                  </Magnetic>
                 )}
               </AnimatePresence>
             </div>
