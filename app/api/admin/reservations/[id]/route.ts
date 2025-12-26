@@ -4,6 +4,33 @@ import { sendApprovalEmail, sendRejectionEmail, sendVoucherEmail } from '@/lib/e
 import { generateVoucherCode, generateQRCodeData, getExpiryDate } from '@/lib/voucher-helpers';
 import { generateVoucherPDF } from '@/lib/pdf-generator';
 
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Primeiro, deletar vouchers relacionados (se existirem)
+    await prisma.voucher.deleteMany({
+      where: { reservationId: id }
+    });
+
+    // Depois, deletar a reserva
+    await prisma.reservation.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true, message: 'Reserva removida com sucesso' });
+  } catch (error) {
+    console.error('Erro ao remover reserva:', error);
+    return NextResponse.json(
+      { error: 'Erro ao remover reserva' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

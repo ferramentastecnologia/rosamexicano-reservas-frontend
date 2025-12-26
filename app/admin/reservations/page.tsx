@@ -19,7 +19,10 @@ import {
   RefreshCw,
   X,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Trash2,
+  CalendarCheck,
+  History
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -51,6 +54,7 @@ type Reservation = {
 
 type SortColumn = 'dataHora' | 'nome' | 'status' | null;
 type SortDirection = 'asc' | 'desc';
+type TimeFilter = 'upcoming' | 'past' | 'all';
 
 export default function AdminReservations() {
   const router = useRouter();
@@ -59,9 +63,11 @@ export default function AdminReservations() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('upcoming');
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [sortColumn, setSortColumn] = useState<SortColumn>('dataHora'); // Padrão: ordenar por Data/Hora
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc'); // Mais recentes primeiro
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc'); // Próximas primeiro
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -77,7 +83,7 @@ export default function AdminReservations() {
   useEffect(() => {
     filterReservations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, reservations, sortColumn, sortDirection]);
+  }, [searchTerm, statusFilter, timeFilter, reservations, sortColumn, sortDirection]);
 
   const loadReservations = async () => {
     try {
@@ -93,6 +99,21 @@ export default function AdminReservations() {
 
   const filterReservations = () => {
     let filtered = [...reservations];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Filtro por tempo (passadas/futuras)
+    if (timeFilter === 'upcoming') {
+      filtered = filtered.filter(r => {
+        const reservationDate = new Date(r.data + 'T00:00:00');
+        return reservationDate >= today;
+      });
+    } else if (timeFilter === 'past') {
+      filtered = filtered.filter(r => {
+        const reservationDate = new Date(r.data + 'T00:00:00');
+        return reservationDate < today;
+      });
+    }
 
     // Filtro por status
     if (statusFilter !== 'all') {
@@ -182,6 +203,26 @@ export default function AdminReservations() {
       loadReservations();
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
+    }
+  };
+
+  const deleteReservation = async (id: string) => {
+    try {
+      const response = await adminFetch(`/api/admin/reservations/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setDeleteConfirm(null);
+        setSelectedReservation(null);
+        loadReservations();
+      } else {
+        console.error('Erro ao remover reserva');
+        alert('Erro ao remover reserva. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro ao remover reserva:', error);
+      alert('Erro ao remover reserva. Tente novamente.');
     }
   };
 
@@ -285,6 +326,43 @@ export default function AdminReservations() {
           </div>
         </div>
 
+        {/* Time Filter Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setTimeFilter('upcoming')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+              timeFilter === 'upcoming'
+                ? 'bg-[#E53935] text-white'
+                : 'bg-zinc-800 text-zinc-400 hover:text-white'
+            }`}
+          >
+            <CalendarCheck className="w-4 h-4" />
+            Próximas
+          </button>
+          <button
+            onClick={() => setTimeFilter('past')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+              timeFilter === 'past'
+                ? 'bg-zinc-600 text-white'
+                : 'bg-zinc-800 text-zinc-400 hover:text-white'
+            }`}
+          >
+            <History className="w-4 h-4" />
+            Passadas
+          </button>
+          <button
+            onClick={() => setTimeFilter('all')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+              timeFilter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-zinc-800 text-zinc-400 hover:text-white'
+            }`}
+          >
+            <List className="w-4 h-4" />
+            Todas
+          </button>
+        </div>
+
         {/* Filters */}
         <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mb-6">
           <div className="grid md:grid-cols-2 gap-4">
@@ -326,6 +404,8 @@ export default function AdminReservations() {
 
           <div className="mt-4 text-sm text-zinc-400">
             Mostrando {filteredReservations.length} de {reservations.length} reservas
+            {timeFilter === 'upcoming' && ' (próximas)'}
+            {timeFilter === 'past' && ' (passadas)'}
           </div>
         </div>
 
@@ -411,6 +491,13 @@ export default function AdminReservations() {
                                 </button>
                               </>
                             )}
+                            <button
+                              onClick={() => setDeleteConfirm(reservation.id)}
+                              className="p-2 bg-red-900/30 hover:bg-red-900/50 rounded transition"
+                              title="Remover Reserva"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -577,10 +664,48 @@ export default function AdminReservations() {
                   </>
                 )}
                 <button
+                  onClick={() => setDeleteConfirm(selectedReservation.id)}
+                  className="px-4 py-2 bg-red-900 hover:bg-red-800 rounded-lg transition flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Remover
+                </button>
+                <button
                   onClick={() => setSelectedReservation(null)}
                   className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition"
                 >
                   Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-zinc-900 rounded-lg max-w-md w-full border border-zinc-800 p-6">
+            <div className="text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-900/30 flex items-center justify-center mb-4">
+                <Trash2 className="w-6 h-6 text-red-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Remover Reserva</h3>
+              <p className="text-zinc-400 mb-6">
+                Tem certeza que deseja remover esta reserva? Esta ação não pode ser desfeita.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="flex-1 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => deleteReservation(deleteConfirm)}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+                >
+                  Remover
                 </button>
               </div>
             </div>
