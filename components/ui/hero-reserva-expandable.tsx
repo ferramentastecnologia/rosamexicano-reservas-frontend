@@ -10,205 +10,383 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { Magnetic } from './magnetic'
 
-// CSS proporcional para o modal
+// CSS proporcional para o modal - ajusta automaticamente à resolução
 const modalStyles = `
   .reserva-modal-container {
     height: 100vh;
     height: 100dvh;
+    width: 100vw;
   }
 
   .reserva-modal-close {
-    top: clamp(12px, 2vh, 32px);
-    right: clamp(12px, 2vw, 32px);
-    width: clamp(36px, 5vh, 48px);
-    height: clamp(36px, 5vh, 48px);
+    top: min(2vh, 16px);
+    right: min(2vw, 16px);
+    width: min(5vh, 40px);
+    height: min(5vh, 40px);
   }
 
   .reserva-modal-close svg {
-    width: clamp(16px, 2.5vh, 24px);
-    height: clamp(16px, 2.5vh, 24px);
+    width: min(3vh, 20px);
+    height: min(3vh, 20px);
   }
 
+  /* LADO ESQUERDO - INFO */
   .reserva-info-side {
-    padding: clamp(20px, 4vh, 64px) clamp(16px, 4vw, 64px);
-    gap: clamp(16px, 3vh, 32px);
+    padding: min(3vh, 32px) min(3vw, 40px);
+    gap: min(2vh, 20px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .reserva-info-logo {
-    height: clamp(40px, 8vh, 64px);
+    height: min(7vh, 56px);
   }
 
   .reserva-info-title {
-    font-size: clamp(1.5rem, 4vh, 3rem);
+    font-size: min(5vh, 2.5rem);
     line-height: 1.1;
   }
 
   .reserva-info-desc {
-    font-size: clamp(0.875rem, 2vh, 1.125rem);
+    font-size: min(2vh, 1rem);
   }
 
   .reserva-benefit-card {
-    padding: clamp(12px, 2vh, 16px);
-    border-radius: clamp(10px, 1.5vh, 12px);
+    padding: min(1.5vh, 12px);
+    border-radius: min(1.5vh, 10px);
   }
 
   .reserva-benefit-icon {
-    width: clamp(36px, 5vh, 48px);
-    height: clamp(36px, 5vh, 48px);
+    width: min(5vh, 40px);
+    height: min(5vh, 40px);
   }
 
   .reserva-benefit-icon svg {
-    width: clamp(18px, 2.5vh, 24px);
-    height: clamp(18px, 2.5vh, 24px);
+    width: min(2.5vh, 20px);
+    height: min(2.5vh, 20px);
   }
 
   .reserva-benefit-title {
-    font-size: clamp(0.875rem, 2vh, 1.125rem);
+    font-size: min(1.8vh, 0.95rem);
   }
 
   .reserva-benefit-desc {
-    font-size: clamp(0.75rem, 1.5vh, 0.875rem);
+    font-size: min(1.5vh, 0.8rem);
   }
 
+  /* LADO DIREITO - FORM */
   .reserva-form-side {
-    padding: clamp(12px, 2vh, 32px);
+    padding: min(2vh, 24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .reserva-form-card {
-    padding: clamp(16px, 3vh, 24px);
-    border-radius: clamp(14px, 2vh, 20px);
-    max-width: min(420px, 95%);
+    padding: min(2.5vh, 20px);
+    border-radius: min(2vh, 16px);
+    width: 100%;
+    max-width: min(95%, 400px);
   }
 
   .reserva-form-title {
-    font-size: clamp(1rem, 2.5vh, 1.25rem);
-    margin-bottom: clamp(2px, 0.5vh, 4px);
+    font-size: min(2.5vh, 1.15rem);
+    margin-bottom: min(0.5vh, 4px);
   }
 
   .reserva-form-subtitle {
-    font-size: clamp(0.65rem, 1.3vh, 0.75rem);
+    font-size: min(1.5vh, 0.75rem);
   }
 
   .reserva-form-label {
-    font-size: clamp(9px, 1.2vh, 11px);
-    margin-bottom: clamp(3px, 0.5vh, 4px);
+    font-size: min(1.4vh, 11px);
+    margin-bottom: min(0.5vh, 4px);
   }
 
   .reserva-form-input {
-    padding: clamp(8px, 1.5vh, 10px) clamp(10px, 1.5vw, 12px);
-    font-size: clamp(0.8rem, 1.6vh, 0.875rem);
-    border-radius: clamp(6px, 1vh, 8px);
+    padding: min(1.3vh, 10px) min(1.5vw, 12px);
+    font-size: min(1.8vh, 0.875rem);
+    border-radius: min(1vh, 8px);
   }
 
   .reserva-form-grid {
-    gap: clamp(8px, 1.5vh, 12px);
+    gap: min(1.2vh, 10px);
   }
 
   .reserva-form-space {
-    gap: clamp(8px, 1.5vh, 12px);
+    gap: min(1.2vh, 10px);
   }
 
+  /* CALENDARIO */
   .reserva-calendar {
-    padding: clamp(12px, 2vh, 16px);
-    border-radius: clamp(10px, 1.5vh, 12px);
+    padding: min(1.5vh, 12px);
+    border-radius: min(1.5vh, 10px);
   }
 
   .reserva-calendar-header {
-    margin-bottom: clamp(8px, 1.5vh, 12px);
+    margin-bottom: min(1vh, 8px);
   }
 
   .reserva-calendar-title {
-    font-size: clamp(0.75rem, 1.5vh, 0.875rem);
+    font-size: min(1.6vh, 0.85rem);
   }
 
   .reserva-calendar-nav {
-    padding: clamp(4px, 0.8vh, 6px);
+    padding: min(0.8vh, 6px);
   }
 
   .reserva-calendar-nav svg {
-    width: clamp(12px, 1.8vh, 16px);
-    height: clamp(12px, 1.8vh, 16px);
+    width: min(2vh, 14px);
+    height: min(2vh, 14px);
   }
 
   .reserva-calendar-weekday {
-    font-size: clamp(9px, 1.2vh, 11px);
-    padding: clamp(3px, 0.5vh, 4px) 0;
+    font-size: min(1.3vh, 10px);
+    padding: min(0.5vh, 4px) 0;
   }
 
   .reserva-calendar-day {
-    font-size: clamp(10px, 1.3vh, 12px);
-    border-radius: clamp(4px, 0.8vh, 6px);
+    font-size: min(1.4vh, 11px);
+    border-radius: min(0.8vh, 6px);
+    padding: min(0.8vh, 6px) min(0.5vw, 4px);
   }
 
+  /* PRECO E SUBMIT */
   .reserva-price-section {
-    padding-top: clamp(12px, 2vh, 16px);
-    margin-top: clamp(8px, 1.5vh, 12px);
+    padding-top: min(1.5vh, 12px);
+    margin-top: min(1vh, 10px);
   }
 
   .reserva-price {
-    font-size: clamp(1.25rem, 3vh, 1.5rem);
+    font-size: min(3vh, 1.35rem);
   }
 
   .reserva-badge {
-    font-size: clamp(8px, 1.1vh, 10px);
-    padding: clamp(3px, 0.5vh, 4px) clamp(8px, 1vw, 12px);
+    font-size: min(1.2vh, 10px);
+    padding: min(0.5vh, 4px) min(1vw, 10px);
   }
 
   .reserva-terms {
-    font-size: clamp(8px, 1.1vh, 10px);
-    margin-bottom: clamp(8px, 1.5vh, 12px);
+    font-size: min(1.2vh, 10px);
+    margin-bottom: min(1vh, 10px);
   }
 
   .reserva-submit-btn {
-    padding: clamp(10px, 2vh, 12px) clamp(16px, 2vw, 24px);
-    font-size: clamp(0.875rem, 1.8vh, 1rem);
-    border-radius: clamp(6px, 1vh, 8px);
+    padding: min(1.5vh, 12px) min(2vw, 20px);
+    font-size: min(1.8vh, 0.95rem);
+    border-radius: min(1vh, 8px);
   }
 
   .reserva-submit-btn svg {
-    width: clamp(16px, 2vh, 20px);
-    height: clamp(16px, 2vh, 20px);
+    width: min(2.2vh, 18px);
+    height: min(2.2vh, 18px);
   }
 
-  /* Layout responsivo para tablet */
-  @media (max-width: 1024px) {
+  /* ==================== DESKTOP (tela grande, lado a lado) ==================== */
+  @media (min-width: 1024px) and (min-height: 600px) {
+    .reserva-modal-content {
+      flex-direction: row;
+      height: 100%;
+    }
+
+    .reserva-info-side {
+      flex: 1;
+      max-width: 50%;
+    }
+
+    .reserva-form-side {
+      flex: 1;
+      max-width: 50%;
+      overflow-y: auto;
+    }
+  }
+
+  /* ==================== TABLET / LAPTOP PEQUENO ==================== */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .reserva-modal-content {
+      flex-direction: row;
+      height: 100%;
+    }
+
+    .reserva-info-side {
+      flex: 0 0 40%;
+      padding: 2vh 2vw;
+    }
+
+    .reserva-form-side {
+      flex: 0 0 60%;
+      padding: 2vh 3vw;
+      overflow-y: auto;
+    }
+
+    .reserva-info-side .reserva-form-space {
+      display: none;
+    }
+  }
+
+  /* ==================== MOBILE PORTRAIT ==================== */
+  @media (max-width: 767px) and (orientation: portrait) {
     .reserva-modal-content {
       flex-direction: column;
+      height: 100dvh;
       overflow-y: auto;
-      height: auto;
-      min-height: 100dvh;
+      -webkit-overflow-scrolling: touch;
     }
 
     .reserva-info-side {
       flex: none;
-      padding: clamp(16px, 3vh, 32px) clamp(16px, 4vw, 32px);
+      padding: 16px;
+      min-height: auto;
+    }
+
+    .reserva-info-side .space-y-4,
+    .reserva-info-side .reserva-form-space,
+    .reserva-info-side .mt-auto {
+      display: none;
     }
 
     .reserva-form-side {
-      flex: none;
-      padding: clamp(16px, 3vh, 24px);
+      flex: 1;
+      padding: 12px 16px 32px;
+    }
+
+    .reserva-form-card {
+      max-width: 100%;
+      padding: 16px;
+    }
+
+    .reserva-form-input {
+      font-size: 16px; /* Previne zoom no iOS */
+      padding: 10px 12px;
+    }
+
+    .reserva-calendar-day {
+      padding: 8px 4px;
+      font-size: 12px;
     }
   }
 
-  /* Landscape em telas pequenas */
-  @media (max-height: 600px) and (orientation: landscape) {
+  /* ==================== MOBILE LANDSCAPE ==================== */
+  @media (max-width: 900px) and (orientation: landscape) {
     .reserva-modal-content {
       flex-direction: row;
-      overflow: hidden;
-    }
-
-    .reserva-info-side,
-    .reserva-form-side {
-      overflow-y: auto;
       height: 100dvh;
     }
 
     .reserva-info-side {
-      padding: clamp(12px, 2vh, 24px) clamp(16px, 3vw, 32px);
+      flex: 0 0 30%;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .reserva-info-side .reserva-form-space,
+    .reserva-info-side .mt-auto {
+      display: none;
     }
 
     .reserva-form-side {
-      padding: clamp(8px, 1.5vh, 16px);
+      flex: 0 0 70%;
+      padding: 8px 16px;
+      overflow-y: auto;
+    }
+
+    .reserva-form-card {
+      max-width: 100%;
+      padding: 12px;
+    }
+
+    .reserva-form-input {
+      padding: 8px 10px;
+    }
+
+    .reserva-calendar-day {
+      padding: 4px 2px;
+      font-size: 10px;
+    }
+  }
+
+  /* ==================== TELAS MUITO BAIXAS (notebooks 720p, etc) ==================== */
+  @media (max-height: 700px) and (min-width: 1024px) {
+    .reserva-info-side {
+      padding: 1.5vh 2vw;
+      gap: 1vh;
+    }
+
+    .reserva-info-logo {
+      height: 5vh;
+    }
+
+    .reserva-info-title {
+      font-size: 4vh;
+    }
+
+    .reserva-benefit-card {
+      padding: 1vh;
+    }
+
+    .reserva-benefit-icon {
+      width: 4vh;
+      height: 4vh;
+    }
+
+    .reserva-form-side {
+      padding: 1.5vh;
+    }
+
+    .reserva-form-card {
+      padding: 1.5vh;
+    }
+
+    .reserva-form-space {
+      gap: 0.8vh;
+    }
+
+    .reserva-form-input {
+      padding: 1vh 1vw;
+    }
+
+    .reserva-calendar {
+      padding: 1vh;
+    }
+
+    .reserva-calendar-day {
+      padding: 0.6vh 0.3vw;
+      font-size: 1.2vh;
+    }
+
+    .reserva-price-section {
+      padding-top: 1vh;
+      margin-top: 0.5vh;
+    }
+
+    .reserva-submit-btn {
+      padding: 1.2vh 1.5vw;
+    }
+  }
+
+  /* ==================== TELAS MUITO PEQUENAS (iPhone SE, etc) ==================== */
+  @media (max-width: 375px) {
+    .reserva-form-card {
+      padding: 12px;
+    }
+
+    .reserva-form-grid {
+      gap: 6px;
+    }
+
+    .reserva-form-input {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .reserva-calendar {
+      padding: 8px;
+    }
+
+    .reserva-calendar-day {
+      font-size: 11px;
+      padding: 6px 2px;
     }
   }
 `
@@ -818,13 +996,13 @@ export default function HeroReservaExpandable() {
       {/* Modal Expandido */}
       <AnimatePresence initial={false}>
         {isExpanded && (
-          <div className="reserva-modal-container fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
+          <div className="reserva-modal-container fixed inset-0 z-50 flex items-center justify-center">
             <motion.div
               layoutId="cta-card"
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              style={{ borderRadius: "24px" }}
+              style={{ borderRadius: "0px" }}
               layout
-              className="relative flex h-full w-full overflow-hidden bg-[#C2185B] sm:rounded-[24px] shadow-2xl"
+              className="relative flex h-full w-full overflow-hidden bg-[#C2185B] shadow-2xl"
             >
               {/* Mesh Gradient Background */}
               <motion.div
